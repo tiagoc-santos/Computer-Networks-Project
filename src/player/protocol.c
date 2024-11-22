@@ -48,3 +48,64 @@ int create_socket(int udp){
     }
     return socket_fd;
 }
+
+/*------------------------- UDP Requests -------------------------*/
+
+int send_message_udp(int socket_fd, struct addrinfo* res, char* message, int message_size){
+    size_t bytes_sent;
+
+    bytes_sent = sendto(socket_fd, message, message_size, 0, res->ai_addr, res->ai_addrlen);
+    if (bytes_sent == -1){
+        fprintf(stderr, "Error sending message.\n");
+        return -1;
+    }
+    return 0;
+}
+
+int receive_message_udp(int socket_fd, struct addrinfo* res, char* buffer){
+    size_t bytes_received;
+    struct sockaddr_in addr;
+    socklen_t addrlen;
+    
+    addrlen = sizeof(addr);
+
+    bytes_received = recvfrom(socket_fd, buffer, 8192, 0, (struct  dsockaddr*)&addr, &addrlen);
+  
+    if (bytes_received == -1){
+        if (errno == EAGAIN || errno == EWOULDBLOCK){
+            fprintf(stderr, "Timeout receiving message.\n");
+            return TIMEOUT;
+        }
+        else{
+            fprintf(stderr, "Error receiving message.\n");
+            return -1;
+        }
+    }
+    return 0;
+}
+
+int send_udp_request(char* message, int message_size, int socket_fd, struct addrinfo* res,
+                        char* buffer){
+    int n = 0, ret;
+    
+    while(n < MAX_RESENDS){
+        if (send_udp_message(socket_fd, res, message, message_size) == -1) {
+            return -1;
+        }
+        //TODO: maybe não escreve no buffer (potential bug)
+        ret = receive_message_udp(socket_fd, res, buffer);
+        if (ret != 0){
+            if (ret == TIMEOUT){
+                continue;
+            }
+            // Other unknown error occured
+            else{
+                return -1;
+            }
+        }
+        else{
+            break;
+        }
+    }
+    return 0;
+}
