@@ -1,10 +1,20 @@
 CC = gcc
-CFLAGS = -g -std=c17 -Wall -Werror -Wextra
+CFLAGS = -g -Wall
 
 TARGET = player
 
-all:
-	$(CC) $(TARGET).c -o $(TARGET)
+SRCS = $(wildcard *.c)
+OBJS = $(SRCS:.c=.o)
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	-rm -f *.o $(TARGET)
+	-rm -f $(OBJS) $(TARGET)
+
+.PHONY: clean

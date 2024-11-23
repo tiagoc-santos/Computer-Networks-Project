@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include "protocol.h"
 #include <ctype.h>
+#include "protocol.h"
 
 #define CMD_SIZE 50
 #define ARG_SIZE 10
@@ -13,8 +13,9 @@ int read_line(char *line){
     int i = 0;
 
     memset(line, 0, CMD_SIZE);
-    while((c = getchar()) != '\n')
+    while((c = getchar()) != '\n'){
         line[i++] = c;
+    }
     line[i] = '\0';
     return 0;
 }
@@ -55,10 +56,46 @@ int check_digits(char* num_str){
     return 1;
 }
 
-int validate_start(char cmd_args[ARG_SIZE][CMD_SIZE]){
-    return (num_args(cmd_args) != 3 || strlen(cmd_args[1]) != 6 || !check_digits(cmd_args[1])
-                || !check_digits(cmd_args[2]) || atoi(cmd_args[2]) > 600 || atoi(cmd_args[2]) < 1);
+int validate_start(char cmd_args[ARG_SIZE][CMD_SIZE]) {
+    // Check the number of arguments
+    if (num_args(cmd_args) != 3) {
+        fprintf(stdout, "Validation failed: Incorrect number of arguments. Expected 3.\n");
+        return 1;
+    }
+
+    // Check the length of the second argument
+    if (strlen(cmd_args[1]) != 6) {
+        fprintf(stdout, "Validation failed: The second argument must be 6 characters long.\n");
+        return 1;
+    }
+
+    // Check if the second argument contains only digits
+    if (!check_digits(cmd_args[1])) {
+        fprintf(stdout, "Validation failed: The second argument must contain only digits.\n");
+        return 1;
+    }
+
+    // Check if the third argument contains only digits
+    if (!check_digits(cmd_args[2])) {
+        fprintf(stdout, "Validation failed: The third argument must contain only digits.\n");
+        return 1;
+    }
+
+    // Check if the third argument is within the valid range
+    int timeout = atoi(cmd_args[2]);
+    if (timeout > 600) {
+        fprintf(stdout, "Validation failed: Timeout value cannot exceed 600.\n");
+        return 1;
+    }
+    if (timeout < 1) {
+        fprintf(stdout, "Validation failed: Timeout value must be at least 1.\n");
+        return 1;
+    }
+
+    // All checks passed
+    return 0;
 }
+
 
 int is_valid_color(char* color){
     return (!strcmp(color, "R") || !strcmp(color, "G") || !strcmp(color, "B") || !strcmp(color, "Y") ||
@@ -75,7 +112,8 @@ int validate_try(char cmd_args[ARG_SIZE][CMD_SIZE]){
     return 1;
 }
 
-int main(int argc, char** argv){
+
+int main(int argc, char** argv) {
     char* server_IP = SERVER_IP_DEFAULT;
     char* server_port = SERVER_PORT_DEFAULT;
     struct addrinfo *server_info;
@@ -95,7 +133,7 @@ int main(int argc, char** argv){
         }
     }
 
-    if (argc == 5)
+    if (argc == 5){
         if (!strcmp(argv[1], "-n") && !strcmp(argv[3], "-p")){
             server_IP = argv[2];
             server_port = argv[4];
@@ -104,6 +142,7 @@ int main(int argc, char** argv){
             printf("Invalid arguments\n");
             exit(1);
         }
+    }
 
     if (get_server_info(&server_info, server_IP, server_port, 1) != 0){
         fprintf(stderr, "Error getting server info.\n");
@@ -121,24 +160,14 @@ int main(int argc, char** argv){
         read_line(cmd);
 
         // If the command is empty
-        if(strlen(cmd) == 0)
+        if(strlen(cmd) == 0){
             continue;
-        
+        }
         split_line(cmd, cmd_args);
 
         // start game command
         if (!strcmp(cmd_args[0], "start")){
-            if (!validate_start(cmd_args))
-                fprintf(stderr, "Invalid command.\n");
-
-            //funcao start
-            else{
-            }
-        }
-
-        // start game command
-        else if (!strcmp(cmd_args[0], "start")){
-            if (!validate_start(cmd_args))
+            if (validate_start(cmd_args) != 0)
                 fprintf(stderr, "Invalid command.\n");
 
             //funcao start

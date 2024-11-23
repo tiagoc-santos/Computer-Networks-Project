@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "protocol.h"
 
 #define CMD_SIZE 50
 #define ARG_SIZE 10
@@ -59,6 +60,7 @@ int main() {
         printf("%d", num);
         break; // Exit after one iteration for testing purposes
     }
+
 
     return 0;
 }

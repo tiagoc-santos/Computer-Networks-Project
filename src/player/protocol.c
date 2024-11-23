@@ -26,12 +26,8 @@ int create_socket(int udp){
         socket_fd = socket(AF_INET, SOCK_STREAM, 0); //TCP socket 
     }
 
-    if (socket_fd != 0){
-        fprintf(stderr, "Error creating socket.\n");
-        if (close(socket_fd) != 0){
-            fprintf(stderr, "Error closing the socket.\n");
-            return -1;
-        }
+    if (socket_fd == -1){
+        close(socket_fd);
         return -1;
     }
 
@@ -40,10 +36,7 @@ int create_socket(int udp){
 
     if (setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
         fprintf(stderr, "Error setting timeout.\n");
-        if (close(socket_fd) != 0){
-            fprintf(stderr, "Error closing the socket.\n");
-            return -1;
-        }
+        close(socket_fd);
         return -1;
     }
     return socket_fd;
@@ -69,7 +62,7 @@ int receive_message_udp(int socket_fd, struct addrinfo* res, char* buffer){
     
     addrlen = sizeof(addr);
 
-    bytes_received = recvfrom(socket_fd, buffer, 8192, 0, (struct  dsockaddr*)&addr, &addrlen);
+    bytes_received = recvfrom(socket_fd, buffer, 8192, 0, (struct sockaddr *)&addr, &addrlen);
   
     if (bytes_received == -1){
         if (errno == EAGAIN || errno == EWOULDBLOCK){
@@ -84,12 +77,11 @@ int receive_message_udp(int socket_fd, struct addrinfo* res, char* buffer){
     return 0;
 }
 
-int send_udp_request(char* message, int message_size, int socket_fd, struct addrinfo* res,
-                        char* buffer){
+int send_udp_request(char* message, int message_size, int socket_fd, struct addrinfo* res, char* buffer){
     int n = 0, ret;
     
     while(n < MAX_RESENDS){
-        if (send_udp_message(socket_fd, res, message, message_size) == -1) {
+        if (send_message_udp(socket_fd, res, message, message_size) == -1) {
             return -1;
         }
         //TODO: maybe não escreve no buffer (potential bug)
