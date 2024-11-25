@@ -82,22 +82,26 @@ int send_udp_request(char* message, int message_size, int socket_fd, struct addr
     
     while(n < MAX_RESENDS){
         if (send_message_udp(socket_fd, res, message, message_size) == -1) {
+            fprintf(stderr, "Error starting game.\n");
             return -1;
         }
         //TODO: maybe não escreve no buffer (potential bug)
         ret = receive_message_udp(socket_fd, res, buffer);
         if (ret != 0){
             if (ret == TIMEOUT){
+                fprintf(stderr, "TIMEOUT trying again...\n");
                 continue;
             }
             // Other unknown error occured
             else{
+                fprintf(stderr, "Error starting game.\n");
                 return -1;
             }
         }
         else{
-            break;
+            return 0;
         }
     }
-    return 0;
+    fprintf(stderr, "Could not reach the server. Try again later.\n");
+    return -1;
 }
