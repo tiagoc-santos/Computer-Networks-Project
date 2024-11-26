@@ -1,106 +1,13 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <ctype.h>
 #include "protocol.h"
-
-#define CMD_SIZE 50
-#define ARG_SIZE 10
-#define MSG_SIZE 50
+#include "utils.h"
+#include "start.h"
+#include "try.h"
+#include "quit.h"
 
 int player_udp_socket;
 char* server_IP = SERVER_IP_DEFAULT;
 char* server_port = SERVER_PORT_DEFAULT;
 struct addrinfo *server_info;
-
-int read_line(char *line){
-    char c;
-    int i = 0;
-
-    memset(line, 0, CMD_SIZE);
-    while((c = getchar()) != '\n'){
-        line[i++] = c;
-    }
-    line[i] = '\0';
-    return 0;
-}
-
-void split_line(char *line, char arguments[ARG_SIZE][CMD_SIZE]) {
-    char *token;
-    int i = 0;
-
-    token = strtok(line, " \t\n");
-    while (token != NULL && i < ARG_SIZE) {
-        strcpy(arguments[i++], token);
-        token = strtok(NULL, " \t\n");
-    }
-
-    for (; i < ARG_SIZE; i++) {
-        arguments[i][0] = '\0';
-    }
-}
-
-int num_args(char arguments[ARG_SIZE][CMD_SIZE]){
-    int res = 0;
-    int i = 0;
-    while (i < ARG_SIZE){
-        if (arguments[i++][0] == '\0')
-            break;
-        res++;
-    }
-    return res;
-}
-
-int check_digits(char* num_str){
-    int length = strlen(num_str);
-    int i;
-    for (i = 0; i < length; i++){
-        if (!isdigit(num_str[i]))
-            return 0;
-    }
-    return 1;
-}
-
-int validate_start(char cmd_args[ARG_SIZE][CMD_SIZE]) {
-    return (num_args(cmd_args) != 3 || strlen(cmd_args[1]) != 6 || !check_digits(cmd_args[1])
-                || !check_digits(cmd_args[2]) || atoi(cmd_args[2]) > 600 || atoi(cmd_args[2]) < 1);
-}
-
-int is_valid_color(char* color){
-    return (!strcmp(color, "R") || !strcmp(color, "G") || !strcmp(color, "B") || !strcmp(color, "Y") ||
-                !strcmp(color, "O") || !strcmp(color, "P"));
-}
-
-int validate_try(char cmd_args[ARG_SIZE][CMD_SIZE]){
-    int i;
-
-    for (i = 1; i < 5; i++){
-        if (!is_valid_color(cmd_args[i]))
-            return 0;
-    }
-    return 1;
-}
-
-int start_game(char PLID[ARG_SIZE], char time[ARG_SIZE]){
-    char message[MSG_SIZE], response[MSG_SIZE];
-    int time_num = atoi(time);
-    sprintf(message, "SNG %s %03d\n", PLID, time_num);
-    if(send_udp_request(message, strlen(message), player_udp_socket, server_info, response) == -1)
-        return -1;
-
-    if (!strcmp(response, "RSG OK\n"))
-        printf("Game started. You have %d seconds to guess the key.\n", time_num);
-
-    else if (!strcmp(response, "RSG NOK\n"))
-        printf("Game already started. Quit the game to start a new one.\n");
-
-    else if (!strcmp(response, "ERR\n"))
-        printf("Error starting game.\n");
-        
-    return 0;
-}
-
 
 int main(int argc, char** argv) {
     int game_running = 0;
@@ -161,6 +68,12 @@ int main(int argc, char** argv) {
                 game_running = 1;
             }
         }
+
+        // debug command
+        else if (!strcmp(cmd_args[0], "debug")){
+            
+        }
+        
         // checks if a game is running
         else if(!game_running){
             fprintf(stdout, "You need to start a game first.\n");
@@ -187,18 +100,16 @@ int main(int argc, char** argv) {
 
         // quit command
         else if (!strcmp(cmd_args[0], "quit")){
-            if (game_running)
-                //manda msg  e meter game running a 0  
-                continue; 
+            if(quit_game(cmd_args[1]) != 0)
+                fprintf(stderr, "Unable to quit\n");
+            
+            else
+                game_running = 0;
+
         }
 
         // exit command
         else if (!strcmp(cmd_args[0], "exit")){
-            
-        }
-
-        // debug command
-        else if (!strcmp(cmd_args[0], "debug")){
             
         }
     }

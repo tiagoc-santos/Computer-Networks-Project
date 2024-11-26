@@ -1,20 +1,29 @@
 CC = gcc
 CFLAGS = -g -Wall
 
-TARGET = player
+TARGET_DIR = ../..
+TARGET = $(TARGET_DIR)/player
 
-SRCS = $(wildcard *.c)
-OBJS = $(SRCS:.c=.o)
+SRC_DIRS = .
+SRCS = $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
+
+OBJ_DIR = bin
+OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRCS))
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@
 
-%.o: %.c
+$(OBJ_DIR)/%.o: %.c | $(OBJ_DIR)
+	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
+
 clean:
-	-rm -f $(OBJS) $(TARGET)
+	rm -f $(TARGET) $(OBJS)
+	rm -rf $(OBJ_DIR)
 
 .PHONY: clean

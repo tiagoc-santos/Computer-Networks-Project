@@ -15,6 +15,11 @@
 #include <errno.h>
 #include <string.h>
 
+extern int player_udp_socket;
+extern char* server_IP;
+extern char* server_port;
+extern struct addrinfo *server_info;
+
 int get_server_info(struct addrinfo** res, char* server_IP, char* server_port, int udp);
 int create_socket(int udp);
 int send_message_udp(int socket_fd, struct addrinfo* res, char* message, int message_size);
