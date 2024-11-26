@@ -33,9 +33,10 @@ int create_socket(int udp){
 
     /*Set timeout for operations*/
     timeout.tv_sec = 5;
+    timeout.tv_usec = 0;
 
     if (setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
-        fprintf(stderr, "Error setting timeout.\n");
+        fprintf(stderr, "Error setting timeout.\n %s\n", strerror(errno));
         close(socket_fd);
         return -1;
     }
