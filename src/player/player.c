@@ -7,6 +7,12 @@
 
 #define CMD_SIZE 50
 #define ARG_SIZE 10
+#define MSG_SIZE 50
+
+int player_udp_socket;
+char* server_IP = SERVER_IP_DEFAULT;
+char* server_port = SERVER_PORT_DEFAULT;
+struct addrinfo *server_info;
 
 int read_line(char *line){
     char c;
@@ -76,12 +82,27 @@ int validate_try(char cmd_args[ARG_SIZE][CMD_SIZE]){
     return 1;
 }
 
+int start_game(char PLID[ARG_SIZE], char time[ARG_SIZE]){
+    char message[MSG_SIZE], response[MSG_SIZE];
+    int time_num = atoi(time);
+    sprintf(message, "SNG %s %03d\n", PLID, time_num);
+    if(send_udp_request(message, strlen(message), player_udp_socket, server_info, response) == -1)
+        return -1;
+
+    if (!strcmp(response, "RSG OK\n"))
+        printf("Game started. You have %d seconds to guess the key.\n", time_num);
+
+    else if (!strcmp(response, "RSG NOK\n"))
+        printf("Game already started. Quit the game to start a new one.\n");
+
+    else if (!strcmp(response, "ERR\n"))
+        printf("Error starting game.\n");
+        
+    return 0;
+}
+
 
 int main(int argc, char** argv) {
-    char* server_IP = SERVER_IP_DEFAULT;
-    char* server_port = SERVER_PORT_DEFAULT;
-    struct addrinfo *server_info;
-    int player_udp_socket;
     int game_running = 0;
 
     if(argc == 3){
@@ -136,6 +157,7 @@ int main(int argc, char** argv) {
 
             //funcao start
             else{
+                start_game(cmd_args[1], cmd_args[2]);
                 game_running = 1;
             }
         }
