@@ -6,6 +6,6 @@
 
 #define ANSWER_SIZE 256
 
-int quit_game(char PLID[ARG_SIZE]);
+int quit_game(char PLID[PLID_SIZE]);
 
 #endif

@@ -67,11 +67,9 @@ int receive_message_udp(int socket_fd, struct addrinfo* res, char* buffer){
   
     if (bytes_received == -1){
         if (errno == EAGAIN || errno == EWOULDBLOCK){
-            fprintf(stderr, "Timeout receiving message.\n");
             return TIMEOUT;
         }
         else{
-            fprintf(stderr, "Error receiving message.\n");
             return -1;
         }
     }
@@ -86,11 +84,11 @@ int send_udp_request(char* message, int message_size, int socket_fd, struct addr
             fprintf(stderr, "Error starting game.\n");
             return -1;
         }
-        //TODO: maybe não escreve no buffer (potential bug)
         ret = receive_message_udp(socket_fd, res, buffer);
         if (ret != 0){
             if (ret == TIMEOUT){
                 fprintf(stderr, "TIMEOUT trying again...\n");
+                n++;
                 continue;
             }
             // Other unknown error occured

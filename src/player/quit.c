@@ -1,6 +1,6 @@
 #include "quit.h"
 
-int quit_game(char PLID[ARG_SIZE]){
+int quit_game(char PLID[PLID_SIZE]){
     char message[MSG_SIZE], response[MSG_SIZE], response_items[ARG_SIZE][CMD_SIZE];
     char answer[ANSWER_SIZE];
 
@@ -19,8 +19,9 @@ int quit_game(char PLID[ARG_SIZE]){
     else if(!strcmp(response_items[1], "NOK"))
         fprintf(stdout, "There is no game ongoing...\n");
 
-    else
+    else{
         fprintf(stderr, "An error occured while attempting to quit.\n");
-
+        printf("Response: %s\n", response_items[1]);
+    }
     return 0;
 }

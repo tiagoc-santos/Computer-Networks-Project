@@ -4,6 +4,7 @@
 #define CMD_SIZE 50
 #define ARG_SIZE 10
 #define MSG_SIZE 50
+#define PLID_SIZE 7
 
 #include <stdio.h>
 #include <stdlib.h>

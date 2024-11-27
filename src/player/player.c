@@ -11,6 +11,7 @@ struct addrinfo *server_info;
 
 int main(int argc, char** argv) {
     int game_running = 0;
+    char player_id[PLID_SIZE];
 
     if(argc == 3){
         if (!strcmp(argv[1], "-n")){
@@ -49,7 +50,9 @@ int main(int argc, char** argv) {
 
     while(1){
         char cmd[CMD_SIZE], cmd_args[ARG_SIZE][CMD_SIZE];
+        memset(cmd, 0, CMD_SIZE);
         read_line(cmd);
+        memset(cmd_args, 0, ARG_SIZE*CMD_SIZE);
 
         // If the command is empty
         if(strlen(cmd) == 0){
@@ -59,11 +62,18 @@ int main(int argc, char** argv) {
 
         // start game command
         if (!strcmp(cmd_args[0], "start")){
+            if(game_running){
+                fprintf(stderr, "Game already running.\nYou need to quit first.\n");
+                continue;
+            }
+
             if (validate_start(cmd_args) != 0)
                 fprintf(stderr, "Invalid command.\n");
 
             //funcao start
             else{
+                strcpy(player_id, cmd_args[1]);
+                player_id[6] = '\0';
                 start_game(cmd_args[1], cmd_args[2]);
                 game_running = 1;
             }
@@ -74,12 +84,8 @@ int main(int argc, char** argv) {
             
         }
         
-        // checks if a game is running
-        else if(!game_running){
-            fprintf(stdout, "You need to start a game first.\n");
-        }
         // try command
-        else if (!strcmp(cmd_args[0], "try")){
+        else if (!strcmp(cmd_args[0], "try") && game_running){
             if (!validate_try(cmd_args))
                 fprintf(stderr, "Invalid command.\n");
 
@@ -100,7 +106,7 @@ int main(int argc, char** argv) {
 
         // quit command
         else if (!strcmp(cmd_args[0], "quit")){
-            if(quit_game(cmd_args[1]) != 0)
+            if(quit_game(player_id) != 0)
                 fprintf(stderr, "Unable to quit\n");
             
             else
@@ -110,7 +116,15 @@ int main(int argc, char** argv) {
 
         // exit command
         else if (!strcmp(cmd_args[0], "exit")){
-            
+            if(game_running){
+                if(quit_game(player_id) != 0){
+                    fprintf(stderr, "Unable to quit\n");
+                }
+                game_running = 0;
+            }
+            free(server_info);
+            close(player_udp_socket);
+            break;
         }
     }
 
