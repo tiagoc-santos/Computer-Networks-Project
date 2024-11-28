@@ -20,6 +20,10 @@ int start_game(char PLID[ARG_SIZE], char time[ARG_SIZE]){
 
     else if (!strcmp(response, "ERR\n"))
         fprintf(stdout, "Error starting game.\n");
+    
+    else{
+        //printf("resposta: %s", response);
+    }
         
     return 0;
 }

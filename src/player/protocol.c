@@ -1,4 +1,5 @@
 #include "protocol.h"
+#include "utils.h"
 
 int get_server_info(struct addrinfo** res, char* server_IP, char* server_port, int udp){
     int errcode;
@@ -63,8 +64,8 @@ int receive_message_udp(int socket_fd, struct addrinfo* res, char* buffer){
     
     addrlen = sizeof(addr);
 
-    bytes_received = recvfrom(socket_fd, buffer, 8192, 0, (struct sockaddr *)&addr, &addrlen);
-  
+    bytes_received = recvfrom(socket_fd, buffer, MSG_SIZE, 0, (struct sockaddr *)&addr, &addrlen);
+    
     if (bytes_received == -1){
         if (errno == EAGAIN || errno == EWOULDBLOCK){
             return TIMEOUT;
@@ -73,6 +74,7 @@ int receive_message_udp(int socket_fd, struct addrinfo* res, char* buffer){
             return -1;
         }
     }
+    buffer[bytes_received] = '\0';
     return 0;
 }
 
