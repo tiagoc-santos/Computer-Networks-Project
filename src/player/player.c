@@ -122,11 +122,12 @@ int main(int argc, char** argv) {
                 }
                 game_running = 0;
             }
-            free(server_info);
-            close(player_udp_socket);
             break;
         }
     }
+
+    free(server_info);
+    close(player_udp_socket);
 
     return 0;
 }

@@ -106,3 +106,57 @@ int send_udp_request(char* message, int message_size, int socket_fd, struct addr
     fprintf(stderr, "Could not reach the server. Try again later.\n");
     return -1;
 }
+
+/*------------------------- TCP Requests -------------------------*/
+
+int connect_server(int tcp_socket, struct addrinfo* res){
+    if(connect(tcp_socket, res->ai_addr, res->ai_addrlen) == -1){
+        fprintf(stderr, "Error occured while connecting to server.\n");
+        if(close(tcp_socket) == -1){
+            fprintf(stderr, "Error closing socket.\n");
+        }
+        return -1;
+    }
+
+    return 0;
+}
+
+int write_message_tcp(int tcp_socket, char* message){
+    char* ptr, buffer[MSG_SIZE];
+    int nbytes = strlen(message), nwritten;
+    int nleft = nbytes;
+    ptr = strcpy(buffer, message);
+    while(nleft>0){
+        if(write(tcp_socket,ptr,nleft) == -1){
+            fprintf(stderr, "Error sending the message.\n");
+            if(close(tcp_socket) == -1){
+                fprintf(stderr, "Error closing socket.\n");
+            }
+            return -1;
+        }
+        nleft -= nwritten;
+        ptr += nwritten;
+    }
+
+    return 0;
+}
+
+int read_message_tcp(int tcp_socket, char* buffer){
+    char* ptr, buffer[BUFFER_SIZE];
+    int nbytes = MSG_SIZE, nread;
+    int nleft = nbytes;
+    ptr = buffer;
+
+    while(nleft>0){
+        if(read(tcp_socket,ptr,nleft) == -1){
+            fprintf(stderr, "Error reading message.\n");
+            return -1;
+        }
+        else if(nread==0)
+            break;
+
+        nleft -= nread;
+        ptr += nread;
+    }
+    return 0;;
+}

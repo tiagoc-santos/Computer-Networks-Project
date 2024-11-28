@@ -25,5 +25,7 @@ int create_socket(int udp);
 int send_message_udp(int socket_fd, struct addrinfo* res, char* message, int message_size);
 int receive_message_udp(int socket_fd, struct addrinfo* res, char* buffer);
 int send_udp_request(char* message, int message_size, int socket_fd, struct addrinfo* res, char* buffer);
+int write_message_tcp(int tcp_socket, char* message);
+int read_message_tcp(int tcp_socket, char* buffer);
 
 #endif
