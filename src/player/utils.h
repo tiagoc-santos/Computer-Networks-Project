@@ -6,6 +6,7 @@
 #define MSG_SIZE 50
 #define PLID_SIZE 7
 #define BUFFER_SIZE 256
+#define SIZE_COLORS 8
 
 #include <stdio.h>
 #include <stdlib.h>

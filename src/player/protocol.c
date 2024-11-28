@@ -1,5 +1,4 @@
 #include "protocol.h"
-#include "utils.h"
 
 int get_server_info(struct addrinfo** res, char* server_IP, char* server_port, int udp){
     int errcode;
@@ -127,7 +126,8 @@ int write_message_tcp(int tcp_socket, char* message){
     int nleft = nbytes;
     ptr = strcpy(buffer, message);
     while(nleft>0){
-        if(write(tcp_socket,ptr,nleft) == -1){
+        nwritten = write(tcp_socket,ptr,nleft);
+        if(nwritten == -1){
             fprintf(stderr, "Error sending the message.\n");
             if(close(tcp_socket) == -1){
                 fprintf(stderr, "Error closing socket.\n");
@@ -141,14 +141,15 @@ int write_message_tcp(int tcp_socket, char* message){
     return 0;
 }
 
-int read_message_tcp(int tcp_socket, char* buffer){
-    char* ptr, buffer[BUFFER_SIZE];
+int read_message_tcp(int tcp_socket, char buffer[BUFFER_SIZE]){
+    char* ptr;
     int nbytes = MSG_SIZE, nread;
     int nleft = nbytes;
     ptr = buffer;
 
-    while(nleft>0){
-        if(read(tcp_socket,ptr,nleft) == -1){
+    while(nleft > 0){
+        nread = read(tcp_socket,ptr,nleft);
+        if(nread == -1){
             fprintf(stderr, "Error reading message.\n");
             return -1;
         }
@@ -158,5 +159,5 @@ int read_message_tcp(int tcp_socket, char* buffer){
         nleft -= nread;
         ptr += nread;
     }
-    return 0;;
+    return 0;
 }

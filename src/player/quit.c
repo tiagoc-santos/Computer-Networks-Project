@@ -21,7 +21,7 @@ int quit_game(char PLID[PLID_SIZE]){
 
     else{
         fprintf(stderr, "An error occured while attempting to quit.\n");
-        printf("Response: %s\n", response_items[1]);
+        return -1;
     }
     return 0;
 }

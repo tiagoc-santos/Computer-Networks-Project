@@ -5,7 +5,7 @@ int validate_start(char cmd_args[ARG_SIZE][CMD_SIZE]) {
                 || !check_digits(cmd_args[2]) || atoi(cmd_args[2]) > 600 || atoi(cmd_args[2]) < 1);
 }
 
-int start_game(char PLID[ARG_SIZE], char time[ARG_SIZE]){
+int start_game(char PLID[PLID_SIZE], char time[ARG_SIZE]){
     char message[MSG_SIZE], response[MSG_SIZE];
     int time_num = atoi(time);
     sprintf(message, "SNG %s %03d\n", PLID, time_num);
@@ -14,17 +14,16 @@ int start_game(char PLID[ARG_SIZE], char time[ARG_SIZE]){
 
     if (!strcmp(response, "RSG OK\n"))
         fprintf(stdout, "Game started. You have %d seconds to guess the key.\n", time_num);
-
-    else if (!strcmp(response, "RSG NOK\n"))
-        fprintf(stdout, "Game already started. Quit the game to start a new one.\n");
-
-    else if (!strcmp(response, "ERR\n"))
-        fprintf(stdout, "Error starting game.\n");
     
-    else{
-        //printf("resposta: %s", response);
+    else if (!strcmp(response, "RSG NOK\n")){
+        fprintf(stdout, "Game ongoing. Quit the game to start a new one.\n");
+        return 1;
     }
-        
+
+    else if (!strcmp(response, "ERR\n")){
+        fprintf(stderr, "Error starting game.\n");
+        return -1;
+    }
     return 0;
 }
 

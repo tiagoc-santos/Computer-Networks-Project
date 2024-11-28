@@ -3,6 +3,7 @@
 #include "start.h"
 #include "try.h"
 #include "quit.h"
+#include "debug.h"
 
 int player_udp_socket;
 char* server_IP = SERVER_IP_DEFAULT;
@@ -62,36 +63,43 @@ int main(int argc, char** argv) {
 
         // start game command
         if (!strcmp(cmd_args[0], "start")){
-            if(game_running){
-                fprintf(stderr, "Game already running.\nYou need to quit first.\n");
+            if (validate_start(cmd_args) != 0){
+                fprintf(stderr, "Invalid command.\n");
                 continue;
             }
 
-            if (validate_start(cmd_args) != 0)
-                fprintf(stderr, "Invalid command.\n");
-
-            //funcao start
-            else{
-                strcpy(player_id, cmd_args[1]);
-                player_id[6] = '\0';
-                start_game(cmd_args[1], cmd_args[2]);
-                game_running = 1;
+            strcpy(player_id, cmd_args[1]);
+            player_id[6] = '\0';
+            if(start_game(player_id, cmd_args[2]) != 0){
+                continue;
             }
+            game_running = 1;
+            
         }
 
         // debug command
         else if (!strcmp(cmd_args[0], "debug")){
-            
+            if(validate_debug(cmd_args) != 0){
+                fprintf(stderr, "Invalid command.\n");
+                continue;
+            }
+            char colors[SIZE_COLORS];
+            sprintf(colors, "%c %c %c %c", cmd_args[3][0], cmd_args[4][0], cmd_args[5][0], cmd_args[6][0]);
+            strcpy(player_id, cmd_args[1]);
+            player_id[6] = '\0';
+            if(debug_game(player_id, atoi(cmd_args[2]), colors) != 0){
+                continue;
+            }
+            game_running = 1;
         }
         
         // try command
         else if (!strcmp(cmd_args[0], "try") && game_running){
-            if (!validate_try(cmd_args))
+            if (validate_try(cmd_args)){
                 fprintf(stderr, "Invalid command.\n");
-
-            //funcao try
-            else{
+                continue;
             }
+            //funcao try
         }
 
         // show trials command
@@ -106,19 +114,19 @@ int main(int argc, char** argv) {
 
         // quit command
         else if (!strcmp(cmd_args[0], "quit")){
-            if(quit_game(player_id) != 0)
+            if(quit_game(player_id) != 0){
                 fprintf(stderr, "Unable to quit\n");
-            
-            else
-                game_running = 0;
-
+                continue;
+            }
+            game_running = 0;
         }
 
         // exit command
         else if (!strcmp(cmd_args[0], "exit")){
             if(game_running){
                 if(quit_game(player_id) != 0){
-                    fprintf(stderr, "Unable to quit\n");
+                    fprintf(stderr, "Unable to exit\n");
+                    continue;
                 }
                 game_running = 0;
             }
