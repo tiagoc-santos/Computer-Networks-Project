@@ -125,7 +125,8 @@ int write_message_tcp(int tcp_socket, char* message){
     int nbytes = strlen(message), nwritten;
     int nleft = nbytes;
     ptr = strcpy(buffer, message);
-    while(nleft>0){
+    
+    while(nleft > 0){
         nwritten = write(tcp_socket,ptr,nleft);
         if(nwritten == -1){
             fprintf(stderr, "Error sending the message.\n");
@@ -160,4 +161,20 @@ int read_message_tcp(int tcp_socket, char buffer[BUFFER_SIZE]){
         ptr += nread;
     }
     return 0;
+}
+
+int read_file_tcp(int tcp_socket){
+    char buffer[BUFFER_SIZE];
+    char response_status[MSG_SIZE];
+
+    if (read_message_tcp(tcp_socket, buffer) == -1){
+        fprintf(stderr, "Error reading file.\n");
+        return -1;
+    }
+
+    //stpncpy(response_status, buffer, );
+
+    
+
+
 }
