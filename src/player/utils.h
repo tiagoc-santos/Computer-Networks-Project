@@ -7,12 +7,17 @@
 #define PLID_SIZE 7
 #define BUFFER_SIZE 2048
 #define SIZE_COLORS 8
+#define STR 1
+#define ACT 2
+#define FIN 3
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <ctype.h>
+#include <unistd.h>
 
 int read_line(char *line);
 void split_line(char *line, char arguments[ARG_SIZE][CMD_SIZE]);

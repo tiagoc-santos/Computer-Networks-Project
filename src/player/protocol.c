@@ -142,39 +142,75 @@ int write_message_tcp(int tcp_socket, char* message){
     return 0;
 }
 
-int read_message_tcp(int tcp_socket, char buffer[BUFFER_SIZE]){
-    char* ptr;
-    int nbytes = MSG_SIZE, nread;
-    int nleft = nbytes;
-    ptr = buffer;
-
-    while(nleft > 0){
-        nread = read(tcp_socket,ptr,nleft);
-        if(nread == -1){
-            fprintf(stderr, "Error reading message.\n");
-            return -1;
-        }
-        else if(nread==0)
-            break;
-
-        nleft -= nread;
-        ptr += nread;
+int read_message_tcp(int tcp_socket, char buffer[BUFFER_SIZE],int size){
+    int aux = read(socket, buffer, size);
+    if (aux == -1) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+            fprintf(stderr,"Timeout: Server did not respond within the specified time.\n");
+        
+        else 
+            fprintf(stderr, "Receive failed\n");
+        
+        if(close(tcp_socket) == -1)
+            fprintf(stderr, "Error closing server connection\n");
+        
+        return -1;
     }
-    return 0;
+
+    return aux;
 }
 
-int read_file_tcp(int tcp_socket){
+int read_file_tcp(int tcp_socket, int type){
     char buffer[BUFFER_SIZE];
     char response_status[MSG_SIZE];
+    char filepath[BUFFER_SIZE];
+    FILE *file;
 
-    if (read_message_tcp(tcp_socket, buffer) == -1){
+    if (read_message_tcp(tcp_socket, buffer, BUFFER_SIZE) == -1){
         fprintf(stderr, "Error reading file.\n");
         return -1;
     }
 
-    //stpncpy(response_status, buffer, );
+    if(type ==  STR){
+        strncpy(response_status, buffer, 7);
 
-    
+        if(!strcmp(response_status, "RST NOK"))
+            return 1;
+        /*
+        sprintf(filepath, );
+        file = fopen(path.c_str(), "w");
 
+        ssize_t file_size=stoi(fsize);
+        while (1){
+            aux = read(client_tcp_socket, buffer, BUFFER_SIZE);
+            if(aux == -1) 
+                return -1; 
+            if(aux == 0)
+                break;
+            if(file_size==aux-1){
+                aux=fwrite(buffer,1,aux-1,file);
+                file_size-=aux;
+                if(file_size==0)
+                    break;
+                else{
+                    fclose(file);
+                    fprintf(stderr, "ERROR\n");
+                    return;
+                }
+            }                 
+            aux = fwrite(buffer,1,aux,file);
+            file_size -= aux;
+            }
+            fclose(file);
 
+        if(!strcmp(response_status, "RST ACT"))
+            return ACT;
+        
+
+        if(!strcmp(response_status, "RST FIN"))
+            return FIN;
+    */
+    }
+
+    return 0;
 }
