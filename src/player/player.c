@@ -64,6 +64,11 @@ int main(int argc, char** argv) {
 
         // start game command
         if (!strcmp(cmd_args[0], "start")){
+            if (game_running){
+                fprintf(stderr, "There is a game already running...\n");
+                continue;
+            }
+
             if (validate_start(cmd_args) != 0){
                 fprintf(stderr, "Invalid command.\n");
                 continue;
@@ -81,6 +86,11 @@ int main(int argc, char** argv) {
 
         // debug command
         else if (!strcmp(cmd_args[0], "debug")){
+            if (game_running){
+                fprintf(stderr, "There is a game already running...\n");
+                continue;
+            }
+            
             if(validate_debug(cmd_args) != 0){
                 fprintf(stderr, "Invalid command.\n");
                 continue;
