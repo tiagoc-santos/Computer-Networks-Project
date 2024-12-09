@@ -51,6 +51,7 @@ int main(int argc, char** argv) {
 
     while(1){
         char cmd[CMD_SIZE], cmd_args[ARG_SIZE][CMD_SIZE];
+        int nT;
         memset(cmd, 0, CMD_SIZE);
         read_line(cmd);
         memset(cmd_args, 0, ARG_SIZE*CMD_SIZE);
@@ -74,6 +75,7 @@ int main(int argc, char** argv) {
                 continue;
             }
             game_running = 1;
+            nT = 1;
             
         }
 
@@ -91,12 +93,17 @@ int main(int argc, char** argv) {
                 continue;
             }
             game_running = 1;
+            nT = 1;
         }
         
         // try command
         else if (!strcmp(cmd_args[0], "try") && game_running){
             if (validate_try(cmd_args)){
                 fprintf(stderr, "Invalid command.\n");
+                continue;
+            }
+            if(try(player_id, cmd_args[1], cmd_args[2], cmd_args[3], cmd_args[4], &nT) != 0){
+                fprintf(stderr, "Error sending attempt.\n");
                 continue;
             }
             //funcao try
