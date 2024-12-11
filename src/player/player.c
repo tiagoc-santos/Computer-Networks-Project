@@ -112,10 +112,12 @@ int main(int argc, char** argv) {
                 fprintf(stderr, "Invalid command.\n");
                 continue;
             }
-            if(try(player_id, cmd_args[1], cmd_args[2], cmd_args[3], cmd_args[4], &nT) != 0){
-                fprintf(stderr, "Error sending attempt.\n");
+            int ret_try = try(player_id, cmd_args[1], cmd_args[2], cmd_args[3], cmd_args[4], &nT);
+            if(ret_try == -1)
                 continue;
-            }
+            if(ret_try == GAME_ENDED)
+                game_running = 0;
+
             //funcao try
         }
 
