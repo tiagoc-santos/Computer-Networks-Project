@@ -4,6 +4,8 @@
 #include "try.h"
 #include "quit.h"
 #include "debug.h"
+#include "show_trials.h"
+#include "scoreboard.h"
 
 int player_udp_socket;
 char* server_IP = SERVER_IP_DEFAULT;
@@ -38,10 +40,9 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (get_server_info(&server_info, server_IP, server_port, 1) != 0){
-        fprintf(stderr, "Error getting server info.\n");
+    if (get_server_info(&server_info, server_IP, server_port, 1) != 0)
         exit(1);
-    }
+    
 
     player_udp_socket = create_socket(1);
     if (player_udp_socket == -1){
@@ -123,12 +124,16 @@ int main(int argc, char** argv) {
 
         // show trials command
         else if (!strcmp(cmd_args[0], "st") || !strcmp(cmd_args[0], "show_trials")){
-
+            if(show_trials(player_id) != 0){
+                continue;
+            }
         }
 
         // scoreboard command
         else if (!strcmp(cmd_args[0], "sb") || !strcmp(cmd_args[0], "scoreboard")){
-            
+            if(scoreboard() != 0){
+                continue;
+            }
         }
 
         // quit command

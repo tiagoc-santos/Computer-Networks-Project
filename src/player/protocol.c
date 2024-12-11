@@ -125,7 +125,6 @@ int write_message_tcp(int tcp_socket, char* message){
     int nbytes = strlen(message), nwritten;
     int nleft = nbytes;
     ptr = strcpy(buffer, message);
-    
     while(nleft > 0){
         nwritten = write(tcp_socket,ptr,nleft);
         if(nwritten == -1){
@@ -143,74 +142,159 @@ int write_message_tcp(int tcp_socket, char* message){
 }
 
 int read_message_tcp(int tcp_socket, char buffer[BUFFER_SIZE],int size){
-    int aux = read(socket, buffer, size);
+    memset(buffer, 0, BUFFER_SIZE);
+    int aux = read(tcp_socket, buffer, size);
     if (aux == -1) {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
             fprintf(stderr,"Timeout: Server did not respond within the specified time.\n");
         
         else 
-            fprintf(stderr, "Receive failed\n");
+            fprintf(stderr, "Receive failed.\n");
         
         if(close(tcp_socket) == -1)
-            fprintf(stderr, "Error closing server connection\n");
+            fprintf(stderr, "Error closing server connection.\n");
         
         return -1;
     }
-
+    
     return aux;
 }
 
-int read_file_tcp(int tcp_socket, int type){
-    char buffer[BUFFER_SIZE];
-    char response_status[MSG_SIZE];
-    char filepath[BUFFER_SIZE];
-    FILE *file;
+int read_file_tcp(int tcp_socket){
+    char buffer[BUFFER_SIZE], response[BUFFER_SIZE], 
+    filename[FILENAME_SIZE], filesize[4], filepath[BUFFER_SIZE];
+    int file;
+    int i = 0, k = 0, status = 0, j = 0, l = 0;
 
-    if (read_message_tcp(tcp_socket, buffer, BUFFER_SIZE) == -1){
-        fprintf(stderr, "Error reading file.\n");
+    while (1){
+        if (read_message_tcp(tcp_socket, buffer, 1) == -1) {
+            fprintf(stderr, "Error reading file from server\n");
+            return -1;
+        }
+
+        if (buffer[0] == 'E' && k == 0) {
+            fprintf(stderr, "Unexpected message received.\n");
+            return -1;
+        }
+
+        if (buffer[0] == ' ' || buffer[0] == '\n'){
+            k++;
+
+            if(k == 1)
+                response[i++] = buffer[0];
+            if(k == 2)
+                response[i] = '\0';
+
+            if(k == 2 && !strcmp(response, "RST NOK")){
+                fprintf(stdout, "There is no games in the player record.\n");
+                return 0;
+            }
+
+            if(k == 2 && !strcmp(response, "RSS EMPTY")){
+                fprintf(stdout, "Scoreboard is empty.\n");
+                return 0;
+            }
+
+            if(k == 2 && !strcmp(response, "RST FIN"))
+                status = FIN;
+
+            if(k == 2 && !strcmp(response, "RSS ACT"))
+                status = ACT;
+
+            else if(k > 3){
+                filesize[l] = '\0';
+                break;
+            }
+
+            continue;
+        }
+
+        if(k < 2)
+            response[i++] = buffer[0];
+        
+        if(k == 2)
+            filename[j++] = buffer[0];
+        
+        if(k == 3){
+            filename[j] = '\0';
+            filesize[l++] = buffer[0]; 
+        }
+    }
+    printf("%s\n", response);
+    strcpy(filepath, "src/player/scores/");
+    if (mkdir(filepath, 0777) == -1) {
+        if (errno != EEXIST) {
+            fprintf(stderr,"Error creating directory");
+            return -1;
+        }
+    }
+    printf("%s\n", filename);
+    strcat(filepath, filename);
+    file = open(filepath, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR);
+    int fsize = atoi(filesize);
+    if(file == -1){
+        fprintf(stderr, "Error creating file.\n");
+        return -1;
+    }
+    memset(buffer, 0, sizeof(buffer));
+    int bytes_read = 0;
+
+    while(1){
+        int bytes_written = 0;
+        bytes_read = read(tcp_socket, buffer, BUFFER_SIZE);
+        if (bytes_read == -1){
+            fprintf(stderr, "Error reading file data.\n");
+            return -1;
+        }
+        if (bytes_read == 0)
+            break;
+
+        int aux = 0;
+        while (bytes_written < bytes_read){
+            bytes_written = write(file, buffer, bytes_read);
+            if (bytes_written == -1){
+                fprintf(stderr, "Error writing file data.\n");
+                return -1;
+            }
+            bytes_written += aux;
+        }
+        fsize -= bytes_read;
+    }
+
+    if(close(file) == -1){
+        fprintf(stderr, "Error closing the file.\n");
         return -1;
     }
 
-    if(type ==  STR){
-        strncpy(response_status, buffer, 7);
+    return status;
+}
 
-        if(!strcmp(response_status, "RST NOK"))
-            return 1;
-        /*
-        sprintf(filepath, );
-        file = fopen(path.c_str(), "w");
+int send_tcp_request(char message[MSG_SIZE]){
+    int tcp_socket;
 
-        ssize_t file_size=stoi(fsize);
-        while (1){
-            aux = read(client_tcp_socket, buffer, BUFFER_SIZE);
-            if(aux == -1) 
-                return -1; 
-            if(aux == 0)
-                break;
-            if(file_size==aux-1){
-                aux=fwrite(buffer,1,aux-1,file);
-                file_size-=aux;
-                if(file_size==0)
-                    break;
-                else{
-                    fclose(file);
-                    fprintf(stderr, "ERROR\n");
-                    return;
-                }
-            }                 
-            aux = fwrite(buffer,1,aux,file);
-            file_size -= aux;
-            }
-            fclose(file);
-
-        if(!strcmp(response_status, "RST ACT"))
-            return ACT;
-        
-
-        if(!strcmp(response_status, "RST FIN"))
-            return FIN;
-    */
+    if ((tcp_socket = create_socket(0)) == -1) {
+        fprintf(stderr, "Error establishing TCP connection");
+        return -1;
     }
 
-    return 0;
+    struct addrinfo* server_info_tcp;
+    if (get_server_info(&server_info_tcp, server_IP, server_port, 0) != 0)
+        return -1;
+
+    if(connect_server(tcp_socket, server_info_tcp) != 0)
+        return -1;
+
+    if(write_message_tcp(tcp_socket, message) != 0)
+        return -1;
+
+    int status = read_file_tcp(tcp_socket);
+    if(status == -1)
+        return -1;
+    
+    if(close(tcp_socket) != 0){
+        fprintf(stderr, "Error closing tcp connection.\n");
+        return -1;
+    }
+
+    return status;
 }

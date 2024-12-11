@@ -7,10 +7,9 @@
 #define PLID_SIZE 7
 #define BUFFER_SIZE 2048
 #define SIZE_COLORS 8
-#define STR 1
+#define FILENAME_SIZE 24
+#define FIN 1
 #define ACT 2
-#define FIN 3
-
 
 #include <stdio.h>
 #include <stdlib.h>

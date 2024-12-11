@@ -15,6 +15,8 @@
 #include <sys/time.h>
 #include <errno.h>
 #include <string.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #include "utils.h"
 
 extern int player_udp_socket;
@@ -29,5 +31,6 @@ int receive_message_udp(int socket_fd, struct addrinfo* res, char* buffer);
 int send_udp_request(char* message, int message_size, int socket_fd, struct addrinfo* res, char* buffer);
 int write_message_tcp(int tcp_socket, char* message);
 int read_message_tcp(int tcp_socket, char buffer[BUFFER_SIZE], int size);
+int send_tcp_request(char message[MSG_SIZE]);
 
 #endif
