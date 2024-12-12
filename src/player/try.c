@@ -1,5 +1,4 @@
 #include "./headers/try.h"
-#include "./headers/utils.h"
 
 int is_valid_color(char* color){
     return (!strcmp(color, "R") || !strcmp(color, "G") || !strcmp(color, "B") || !strcmp(color, "Y") ||
@@ -17,16 +16,17 @@ int validate_try(char cmd_args[ARG_SIZE][CMD_SIZE]){
 }
 
 int try(char PLID[PLID_SIZE], char c1[CMD_SIZE], char c2[CMD_SIZE], char c3[CMD_SIZE], char c4[CMD_SIZE], int *nT){
-    char message[MSG_SIZE], response[MSG_SIZE], response_items[ARG_SIZE][CMD_SIZE];
+    char message[MSG_SIZE], response[MSG_SIZE], response_items[ARG_SIZE][CMD_SIZE],
+    line[MSG_SIZE];
     int n_args;
     
     sprintf(message, "TRY %s %c %c %c %c %d\n", PLID, c1[0], c2[0], c3[0], c4[0], *nT);
     if(send_udp_request(message, strlen(message), player_udp_socket, server_info, response) == -1)
         return -1;
     
-    split_line(response, response_items);
+    strcpy(line, response);
+    split_line(line, response_items);
     n_args = num_args(response_items);
-
     if (n_args == 2){
         if (!strcmp(response, "RTR NOK\n")){
             fprintf(stdout, "There is no game ongoing\n");

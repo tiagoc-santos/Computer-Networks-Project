@@ -18,6 +18,7 @@
 #include <sys/types.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <signal.h>
 
 int read_line(char *line);
 void split_line(char *line, char arguments[ARG_SIZE][CMD_SIZE]);

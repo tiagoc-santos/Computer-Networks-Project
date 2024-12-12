@@ -247,7 +247,7 @@ int read_file_tcp(int tcp_socket, char filename[FILENAME_SIZE]){
             fprintf(stderr, "Error reading file data.\n");
             return -1;
         }
-        if (bytes_read == 0)
+        if (bytes_read == 0 || fsize == 0)
             break;
 
         int aux = 0;

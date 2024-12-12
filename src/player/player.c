@@ -16,6 +16,13 @@ int main(int argc, char** argv) {
     int game_running = 0;
     char player_id[PLID_SIZE];
 
+    // Ignore SIGPIPE
+    struct sigaction act;
+    memset(&act, 0, sizeof act);
+    act.sa_handler = SIG_IGN;
+    if(sigaction(SIGPIPE, &act, NULL)==-1) 
+        exit(1);
+
     player_id[0] = '\0';
     if(argc == 3){
         if (!strcmp(argv[1], "-n")){
