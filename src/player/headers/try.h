@@ -1,8 +1,8 @@
 #ifndef TRY_H
 #define TRY_H
 
-#include "utils.h"
 #include "protocol.h"
+#include "utils.h"
 #define GAME_ENDED 1
 
 int is_valid_color(char* color);

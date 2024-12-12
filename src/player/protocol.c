@@ -145,6 +145,7 @@ int read_message_tcp(int tcp_socket, char buffer[BUFFER_SIZE],int size){
     memset(buffer, 0, BUFFER_SIZE);
     int aux = read(tcp_socket, buffer, size);
     if (aux == -1) {
+        // check for a timeout
         if (errno == EAGAIN || errno == EWOULDBLOCK)
             fprintf(stderr,"Timeout: Server did not respond within the specified time.\n");
         
@@ -160,9 +161,9 @@ int read_message_tcp(int tcp_socket, char buffer[BUFFER_SIZE],int size){
     return aux;
 }
 
-int read_file_tcp(int tcp_socket){
+int read_file_tcp(int tcp_socket, char filename[FILENAME_SIZE]){
     char buffer[BUFFER_SIZE], response[BUFFER_SIZE], 
-    filename[FILENAME_SIZE], filesize[4], filepath[BUFFER_SIZE];
+    filesize[4], filepath[BUFFER_SIZE];
     int file;
     int i = 0, k = 0, status = 0, j = 0, l = 0;
 
@@ -171,7 +172,7 @@ int read_file_tcp(int tcp_socket){
             fprintf(stderr, "Error reading file from server\n");
             return -1;
         }
-
+        // Server responded with ERR
         if (buffer[0] == 'E' && k == 0) {
             fprintf(stderr, "Unexpected message received.\n");
             return -1;
@@ -191,8 +192,7 @@ int read_file_tcp(int tcp_socket){
             }
 
             if(k == 2 && !strcmp(response, "RSS EMPTY")){
-                fprintf(stdout, "Scoreboard is empty.\n");
-                return 0;
+                return 1;
             }
 
             if(k == 2 && !strcmp(response, "RST FIN"))
@@ -220,15 +220,16 @@ int read_file_tcp(int tcp_socket){
             filesize[l++] = buffer[0]; 
         }
     }
-    printf("%s\n", response);
+
     strcpy(filepath, "src/player/scores/");
+    // Creates directory for scores and trials
     if (mkdir(filepath, 0777) == -1) {
         if (errno != EEXIST) {
             fprintf(stderr,"Error creating directory");
             return -1;
         }
     }
-    printf("%s\n", filename);
+
     strcat(filepath, filename);
     file = open(filepath, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR);
     int fsize = atoi(filesize);
@@ -269,7 +270,7 @@ int read_file_tcp(int tcp_socket){
     return status;
 }
 
-int send_tcp_request(char message[MSG_SIZE]){
+int send_tcp_request(char message[MSG_SIZE], char filename[FILENAME_SIZE]){
     int tcp_socket;
 
     if ((tcp_socket = create_socket(0)) == -1) {
@@ -287,10 +288,7 @@ int send_tcp_request(char message[MSG_SIZE]){
     if(write_message_tcp(tcp_socket, message) != 0)
         return -1;
 
-    int status = read_file_tcp(tcp_socket);
-    if(status == -1)
-        return -1;
-    
+    int status = read_file_tcp(tcp_socket, filename);
     if(close(tcp_socket) != 0){
         fprintf(stderr, "Error closing tcp connection.\n");
         return -1;

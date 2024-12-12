@@ -16,6 +16,7 @@ int main(int argc, char** argv) {
     int game_running = 0;
     char player_id[PLID_SIZE];
 
+    player_id[0] = '\0';
     if(argc == 3){
         if (!strcmp(argv[1], "-n")){
             server_IP = argv[2];
@@ -118,12 +119,11 @@ int main(int argc, char** argv) {
                 continue;
             if(ret_try == GAME_ENDED)
                 game_running = 0;
-
-            //funcao try
         }
 
         // show trials command
-        else if (!strcmp(cmd_args[0], "st") || !strcmp(cmd_args[0], "show_trials")){
+        else if ((!strcmp(cmd_args[0], "st") || !strcmp(cmd_args[0], "show_trials")) 
+                    && player_id[0] != '\0'){
             if(show_trials(player_id) != 0){
                 continue;
             }
@@ -132,12 +132,18 @@ int main(int argc, char** argv) {
         // scoreboard command
         else if (!strcmp(cmd_args[0], "sb") || !strcmp(cmd_args[0], "scoreboard")){
             if(scoreboard() != 0){
+                fprintf(stdout, "No games in record...\n");
                 continue;
             }
         }
 
         // quit command
         else if (!strcmp(cmd_args[0], "quit")){
+            if(player_id[0] == '\0'){
+                fprintf(stdout, "There is no game ongoing...\n");
+                continue;
+            }
+                
             if(quit_game(player_id) != 0){
                 fprintf(stderr, "Unable to quit\n");
                 continue;

@@ -6,6 +6,7 @@
 #define MSG_SIZE 50
 #define PLID_SIZE 7
 #define BUFFER_SIZE 2048
+#define FILE_SIZE 1024
 #define SIZE_COLORS 8
 #define FILENAME_SIZE 24
 #define FIN 1
