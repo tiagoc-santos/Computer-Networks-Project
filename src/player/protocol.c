@@ -1,4 +1,4 @@
-#include "protocol.h"
+#include "./headers/protocol.h"
 
 int get_server_info(struct addrinfo** res, char* server_IP, char* server_port, int udp){
     int errcode;

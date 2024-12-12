@@ -1,4 +1,4 @@
-#include "quit.h"
+#include "./headers/quit.h"
 
 int quit_game(char PLID[PLID_SIZE]){
     char message[MSG_SIZE], response[MSG_SIZE], response_items[ARG_SIZE][CMD_SIZE];

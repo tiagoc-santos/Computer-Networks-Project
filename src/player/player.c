@@ -1,11 +1,11 @@
-#include "protocol.h"
-#include "utils.h"
-#include "start.h"
-#include "try.h"
-#include "quit.h"
-#include "debug.h"
-#include "show_trials.h"
-#include "scoreboard.h"
+#include "./headers/protocol.h"
+#include "./headers/utils.h"
+#include "./headers/start.h"
+#include "./headers/try.h"
+#include "./headers/quit.h"
+#include "./headers/debug.h"
+#include "./headers/show_trials.h"
+#include "./headers/scoreboard.h"
 
 int player_udp_socket;
 char* server_IP = SERVER_IP_DEFAULT;

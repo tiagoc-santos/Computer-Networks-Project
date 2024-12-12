@@ -1,5 +1,4 @@
-#include "try.h"
-#include "utils.h"
+#include "./headers/try.h"
 
 int is_valid_color(char* color){
     return (!strcmp(color, "R") || !strcmp(color, "G") || !strcmp(color, "B") || !strcmp(color, "Y") ||

@@ -1,4 +1,4 @@
-#include "show_trials.h"
+#include "./headers/show_trials.h"
 
 int show_trials(char PLID[PLID_SIZE]){
     char message[MSG_SIZE];

@@ -1,4 +1,4 @@
-#include "debug.h"
+#include "./headers/debug.h"
 
 int validate_colors(char cmd_args[ARG_SIZE][CMD_SIZE]){
     int i;

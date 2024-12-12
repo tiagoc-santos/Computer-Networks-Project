@@ -1,4 +1,4 @@
-#include "scoreboard.h"
+#include "./headers/scoreboard.h"
 
 int scoreboard(){
     char message[MSG_SIZE];

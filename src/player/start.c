@@ -1,4 +1,4 @@
-#include "start.h"
+#include "./headers/start.h"
 
 int validate_start(char cmd_args[ARG_SIZE][CMD_SIZE]) {
     return (num_args(cmd_args) != 3 || strlen(cmd_args[1]) != 6 || !check_digits(cmd_args[1])
