@@ -2,7 +2,7 @@
 #define QUIT_H
 
 #include "protocol.h"
-#include "utils.h"
+#include "../../common/utils.h"
 
 #define ANSWER_SIZE 256
 

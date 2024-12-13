@@ -2,7 +2,7 @@
 #define TRY_H
 
 #include "protocol.h"
-#include "utils.h"
+#include "../../common/utils.h"
 #define GAME_ENDED 1
 
 int is_valid_color(char* color);

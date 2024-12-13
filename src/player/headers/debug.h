@@ -2,7 +2,7 @@
 #define DEBUG_H
 
 #include "protocol.h"
-#include "utils.h"
+#include "../../common/utils.h"
 #include "try.h"
 
 int validate_colors(char cmd_args[ARG_SIZE][CMD_SIZE]);

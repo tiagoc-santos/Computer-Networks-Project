@@ -4,7 +4,7 @@ CFLAGS = -g -Wall
 TARGET_DIR = ../..
 TARGET = $(TARGET_DIR)/player
 
-SRC_DIRS = .
+SRC_DIRS = . ../common
 SRCS = $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
 
 OBJ_DIR = bin
@@ -25,6 +25,7 @@ $(OBJ_DIR):
 clean:
 	rm -f $(TARGET) $(OBJS)
 	rm -rf $(OBJ_DIR)
-	rm -rf ./scores/
+	rm -rf ./common
+	rm -rf ./scores
 
 .PHONY: clean

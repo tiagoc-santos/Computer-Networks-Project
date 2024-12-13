@@ -1,4 +1,4 @@
-#include "./headers/utils.h"
+#include "utils.h"
 
 int read_line(char *line){
     char c;

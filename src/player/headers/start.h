@@ -1,7 +1,7 @@
 #ifndef START_H
 #define START_H
 
-#include "utils.h"
+#include "../../common/utils.h"
 #include "protocol.h"
 
 int validate_start(char cmd_args[ARG_SIZE][CMD_SIZE]);
