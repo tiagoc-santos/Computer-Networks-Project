@@ -21,11 +21,13 @@ int try(char PLID[PLID_SIZE], char c1[CMD_SIZE], char c2[CMD_SIZE], char c3[CMD_
     int n_args;
     
     sprintf(message, "TRY %s %c %c %c %c %d\n", PLID, c1[0], c2[0], c3[0], c4[0], *nT);
+
     if(send_udp_request(message, strlen(message), player_udp_socket, server_info, response) == -1)
         return -1;
     
     strcpy(line, response);
     split_line(line, response_items);
+
     n_args = num_args(response_items);
     if (n_args == 2){
         if (!strcmp(response, "RTR NOK\n")){
@@ -59,7 +61,7 @@ int try(char PLID[PLID_SIZE], char c1[CMD_SIZE], char c2[CMD_SIZE], char c3[CMD_
         }
     }
     
-    if(!strcmp(response, "ERR")){
+    if(!strcmp(response, "RTR ERR\n")){
         fprintf(stderr, "Unknown message received\n");
         return -1;
     }

@@ -15,7 +15,8 @@ struct addrinfo *server_info;
 int main(int argc, char** argv) {
     int game_running = 0;
     char player_id[PLID_SIZE];
-
+    int nT = 1;
+    
     // Ignore SIGPIPE
     struct sigaction act;
     memset(&act, 0, sizeof act);
@@ -60,7 +61,6 @@ int main(int argc, char** argv) {
 
     while(1){
         char cmd[CMD_SIZE], cmd_args[ARG_SIZE][CMD_SIZE];
-        int nT;
         memset(cmd, 0, CMD_SIZE);
         read_line(cmd);
         memset(cmd_args, 0, ARG_SIZE*CMD_SIZE);
@@ -73,11 +73,6 @@ int main(int argc, char** argv) {
 
         // start game command
         if (!strcmp(cmd_args[0], "start")){
-            if (game_running){
-                fprintf(stderr, "There is a game already running...\n");
-                continue;
-            }
-
             if (validate_start(cmd_args) != 0){
                 fprintf(stderr, "Invalid command.\n");
                 continue;
@@ -98,11 +93,6 @@ int main(int argc, char** argv) {
 
         // debug command
         else if (!strcmp(cmd_args[0], "debug")){
-            if (game_running){
-                fprintf(stderr, "There is a game already running...\n");
-                continue;
-            }
-            
             if(validate_debug(cmd_args) != 0){
                 fprintf(stderr, "Invalid command.\n");
                 continue;
