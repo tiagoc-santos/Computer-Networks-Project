@@ -13,7 +13,10 @@ int show_trials(char PLID[PLID_SIZE]){
     
     if(status == -1)
         return -1;
+    else if(status == 0)
+        return 0;
     
+    fprintf(stdout, "Received trial file named \"%s\" (%d Bytes)\n", filename, status);
     strcpy(filepath, "src/player/scores/");
     strcat(filepath, filename);
     

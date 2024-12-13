@@ -165,7 +165,7 @@ int read_file_tcp(int tcp_socket, char filename[FILENAME_SIZE]){
     char buffer[BUFFER_SIZE], response[BUFFER_SIZE], 
     filesize[4], filepath[BUFFER_SIZE];
     int file;
-    int i = 0, k = 0, status = 0, j = 0, l = 0;
+    int i = 0, k = 0, j = 0, l = 0;
 
     while (1){
         if (read_message_tcp(tcp_socket, buffer, 1) == -1) {
@@ -194,12 +194,6 @@ int read_file_tcp(int tcp_socket, char filename[FILENAME_SIZE]){
             if(k == 2 && !strcmp(response, "RSS EMPTY")){
                 return 1;
             }
-
-            if(k == 2 && !strcmp(response, "RST FIN"))
-                status = FIN;
-
-            if(k == 2 && !strcmp(response, "RSS ACT"))
-                status = ACT;
 
             else if(k > 3){
                 filesize[l] = '\0';
@@ -259,15 +253,13 @@ int read_file_tcp(int tcp_socket, char filename[FILENAME_SIZE]){
             }
             bytes_written += aux;
         }
-        fsize -= bytes_read;
     }
 
     if(close(file) == -1){
         fprintf(stderr, "Error closing the file.\n");
         return -1;
     }
-
-    return status;
+    return fsize;
 }
 
 int send_tcp_request(char message[MSG_SIZE], char filename[FILENAME_SIZE]){

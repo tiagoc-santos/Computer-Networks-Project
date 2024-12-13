@@ -13,7 +13,7 @@ int scoreboard(){
         fprintf(stdout, "Scoreboard is empty.\n");
         return 0;
     }
-
+    fprintf(stdout, "Received scoreboard file named \"%s\" (%d Bytes)\n", filename, status);
     strcpy(filepath, "src/player/scores/");
     strcat(filepath, filename);
     

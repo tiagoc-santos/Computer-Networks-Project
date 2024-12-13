@@ -85,12 +85,15 @@ int main(int argc, char** argv) {
 
             strcpy(player_id, cmd_args[1]);
             player_id[6] = '\0';
-            if(start_game(player_id, cmd_args[2]) != 0){
+            int status = start_game(player_id, cmd_args[2]);
+            //ERR has occured
+            if(status == -1)
+                break;
+            else if( status != 0){
                 continue;
             }
             game_running = 1;
-            nT = 1;
-            
+            nT = 1; 
         }
 
         // debug command
@@ -108,7 +111,12 @@ int main(int argc, char** argv) {
             sprintf(colors, "%c %c %c %c", cmd_args[3][0], cmd_args[4][0], cmd_args[5][0], cmd_args[6][0]);
             strcpy(player_id, cmd_args[1]);
             player_id[6] = '\0';
-            if(debug_game(player_id, atoi(cmd_args[2]), colors) != 0){
+            int ret_debug = debug_game(player_id, atoi(cmd_args[2]), colors);
+            
+            //ERR has occurred
+            if(ret_debug == -1)
+                break;
+            else if(ret_debug != 0){
                 continue;
             }
             game_running = 1;
@@ -122,23 +130,32 @@ int main(int argc, char** argv) {
                 continue;
             }
             int ret_try = try(player_id, cmd_args[1], cmd_args[2], cmd_args[3], cmd_args[4], &nT);
+            // ERR has occurred
             if(ret_try == -1)
-                continue;
-            if(ret_try == GAME_ENDED)
+                break;
+            else if(ret_try == GAME_ENDED)
                 game_running = 0;
         }
 
         // show trials command
         else if ((!strcmp(cmd_args[0], "st") || !strcmp(cmd_args[0], "show_trials")) 
                     && player_id[0] != '\0'){
-            if(show_trials(player_id) != 0){
+            
+            int ret_st = show_trials(player_id);
+            //ERR has occurred
+            if(ret_st == -1)
+                break;
+            else
                 continue;
-            }
         }
 
         // scoreboard command
         else if (!strcmp(cmd_args[0], "sb") || !strcmp(cmd_args[0], "scoreboard")){
-            if(scoreboard() != 0){
+            int ret_sb = scoreboard();
+            //ERR has occurred
+            if (ret_sb == -1)
+                break;
+            else if(ret_sb != 0){
                 fprintf(stdout, "No games in record...\n");
                 continue;
             }
@@ -150,8 +167,10 @@ int main(int argc, char** argv) {
                 fprintf(stdout, "There is no game ongoing...\n");
                 continue;
             }
-                
-            if(quit_game(player_id) != 0){
+            int ret_quit = quit_game(player_id);
+            if(ret_quit == -1)
+                break;
+            else if(ret_quit != 0){
                 fprintf(stderr, "Unable to quit\n");
                 continue;
             }

@@ -35,7 +35,7 @@ int try(char PLID[PLID_SIZE], char c1[CMD_SIZE], char c2[CMD_SIZE], char c3[CMD_
 
         else if (!strcmp(response, "RTR INV\n")){
             fprintf(stdout, "Invalid attempt\n");
-            return -1;
+            return 0;
         }
             
         else if (!strcmp(response, "RTR DUP\n")){

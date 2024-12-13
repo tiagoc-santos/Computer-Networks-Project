@@ -9,8 +9,6 @@
 #define FILE_SIZE 1024
 #define SIZE_COLORS 8
 #define FILENAME_SIZE 24
-#define FIN 1
-#define ACT 2
 
 #include <stdio.h>
 #include <stdlib.h>

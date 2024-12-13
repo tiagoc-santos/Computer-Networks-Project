@@ -35,10 +35,6 @@ int debug_game(char PLID[PLID_SIZE], int max_playtime, char colors[SIZE_COLORS])
     else if(!strcmp(response, "ERR\n")){
         fprintf(stderr, "Error occured when starting debug session.\n");
         return -1;
-    }
-
-    else
-        printf("Response: %s", response);
-    
+    }  
     return 0;
 }
