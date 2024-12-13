@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
         
         // try command
         else if (!strcmp(cmd_args[0], "try") && game_running){
-            if (validate_try(cmd_args)){
+            if (validate_try(cmd_args != 0)){
                 fprintf(stderr, "Invalid command.\n");
                 continue;
             }

@@ -82,7 +82,7 @@ int send_udp_request(char* message, int message_size, int socket_fd, struct addr
     
     while(n < MAX_RESENDS){
         if (send_message_udp(socket_fd, res, message, message_size) == -1) {
-            fprintf(stderr, "Error starting game.\n");
+            fprintf(stderr, "Error sending message.\n");
             return -1;
         }
         ret = receive_message_udp(socket_fd, res, buffer);
@@ -94,7 +94,7 @@ int send_udp_request(char* message, int message_size, int socket_fd, struct addr
             }
             // Other unknown error occured
             else{
-                fprintf(stderr, "Error starting game.\n");
+                fprintf(stderr, "Unknown error.\n");
                 return -1;
             }
         }

@@ -13,7 +13,7 @@ int start_game(char PLID[PLID_SIZE], char time[ARG_SIZE]){
         return -1;
         
     if (!strcmp(response, "RSG OK\n"))
-        fprintf(stdout, "Game started. You have %d seconds to guess the key.\n", time_num);
+        fprintf(stdout, "New game started (max  %d seconds)\n", time_num);
     
     else if (!strcmp(response, "RSG NOK\n")){
         fprintf(stdout, "Game ongoing. Quit the game to start a new one.\n");

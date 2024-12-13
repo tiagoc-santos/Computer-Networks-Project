@@ -2,7 +2,6 @@
 #define PROTOCOL_H
 
 #define SERVER_IP_DEFAULT "localhost"
-#define SERVER_PORT_DEFAULT "58019"
 #define MAX_RESENDS 5
 #define TIMEOUT 1
 

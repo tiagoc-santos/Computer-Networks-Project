@@ -69,11 +69,10 @@ int try(char PLID[PLID_SIZE], char c1[CMD_SIZE], char c2[CMD_SIZE], char c3[CMD_
         char response_args[ARG_SIZE][CMD_SIZE];
         split_line(response, response_args);
         if (atoi(response_args[3]) == 4){
-            fprintf(stdout, "Congratulations! You guessed the secret key!\n");
+            fprintf(stdout, "WELL DONE! You guessed the key in %d trials\n", *nT);
             return GAME_ENDED;
         }
-        fprintf(stdout, "Number of correct colors in correct position: %d\n", atoi(response_args[3]));
-        fprintf(stdout, "Number of correct colors in wrong position: %d\n", atoi(response_args[4]));
+        fprintf(stdout, "nB = %d, nW = %d\n", atoi(response_args[3]), atoi(response_args[4]));
         *nT += 1;
         return 0;
     }
