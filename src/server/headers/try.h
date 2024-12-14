@@ -4,5 +4,6 @@
 #include "protocol.h"
 
 int reply_quit(char message_args[ARG_SIZE][CMD_SIZE]);
+int is_valid_color(char* color);
 
 #endif

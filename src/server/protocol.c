@@ -19,7 +19,7 @@ int init_udp_socket(){
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE|AI_NUMERICSERV;
 
-    if((errcode = getaddrinfo(NULL, port, &hints, &udp_res)) != 0){
+    if((errcode = getaddrinfo("localhost", port, &hints, &udp_res)) != 0){
         fprintf(stderr,"error: getaddrinfo: %s\n", gai_strerror(errcode));
         return -1;
     }
@@ -40,7 +40,7 @@ int init_tcp_socket(){
 int send_message_udp(char message[MSG_SIZE]){
     size_t bytes_sent;
 
-    bytes_sent = sendto(udp_socket, message, strlen(message), 0, udp_res->ai_addr, udp_res->ai_addrlen);
+    bytes_sent = sendto(udp_socket, message, strlen(message), 0, (struct sockaddr*)&udp_addr, udp_addrlen);
     if (bytes_sent == -1){
         fprintf(stderr, "Error sending message.\n");
         return -1;

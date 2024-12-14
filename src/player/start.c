@@ -11,7 +11,7 @@ int start_game(char PLID[PLID_SIZE], char time[ARG_SIZE]){
     sprintf(message, "SNG %s %03d\n", PLID, time_num);
     if(send_udp_request(message, strlen(message), player_udp_socket, server_info, response) == -1)
         return -1;
-        
+
     if (!strcmp(response, "RSG OK\n"))
         fprintf(stdout, "New game started (max  %d seconds)\n", time_num);
     

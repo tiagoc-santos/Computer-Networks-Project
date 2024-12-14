@@ -1,4 +1,10 @@
 #include "headers/protocol.h"
+#include "headers/start.h"
+#include "headers/try.h"
+#include "headers/debug.h"
+#include "headers/quit.h"
+#include "headers/show_trials.h"
+#include "headers/scoreboard.h"
 
 int handle_client_udp(){
     char message[MSG_SIZE], message_args[ARG_SIZE][CMD_SIZE];
@@ -8,12 +14,12 @@ int handle_client_udp(){
 
     split_line(message, message_args);
     char* op_code = message_args[0];
-
+    
     // start command
     if (!strcmp(op_code, "SNG")){
-        reply_start(message_args); 
+        reply_start(message_args);
     }
-
+    /*
     // debug command
     else if (!strcmp(op_code, "DBG")){
         reply_debug(message_args);
@@ -38,7 +44,7 @@ int handle_client_udp(){
     else if (!strcmp(op_code, "QUT")){
         reply_quit(message_args);
     }
-
+    */
     else{
         char response[MSG_SIZE];
         strcpy(response, "ERR\n");
@@ -90,9 +96,9 @@ int main(int argc, char** argv){
         return -1;
     
     //TO-DO define function
-    if(init_tcp_socket() == -1)
+    /*if(init_tcp_socket() == -1)
         return -1;
-
+    */
     // File descriptor for select
     fd_set read_file_descriptors;
     
