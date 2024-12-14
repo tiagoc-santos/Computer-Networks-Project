@@ -11,6 +11,7 @@
 #define SIZE_COLORS 8
 #define FILENAME_SIZE 24
 #define SERVER_PORT_DEFAULT "58019"
+#define NUM_COLORS_KEY 4
 
 #include <stdio.h>
 #include <stdlib.h>

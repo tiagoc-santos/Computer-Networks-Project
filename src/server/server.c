@@ -43,12 +43,11 @@ int handle_client_udp(){
         char response[MSG_SIZE];
         strcpy(response, "ERR\n");
         send_message_udp(response);    
-    }   
+    }
+    return 0;
 }
 
 int main(int argc, char** argv){
-    int verbose = 0;
-    
     // Ignore SIGPIPE
     struct sigaction act;
     memset(&act, 0, sizeof act);
