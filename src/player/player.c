@@ -7,21 +7,33 @@
 #include "./headers/show_trials.h"
 #include "./headers/scoreboard.h"
 
-int player_udp_socket;
+int player_udp_socket, game_running = 0;
 char* server_IP = SERVER_IP_DEFAULT;
 char* server_port = SERVER_PORT_DEFAULT;
 struct addrinfo *server_info;
+char player_id[PLID_SIZE];
+
+void handle_sigint(int signal){
+    if(game_running){
+        if(quit_game(player_id) != 0)
+            fprintf(stderr, "Unable to exit\n");
+    }
+    free(server_info);
+    if(close(player_udp_socket) != 0){
+        fprintf(stderr, "Error closing udp socket...\n");
+        exit(1);
+    }
+    exit(0);
+}
 
 int main(int argc, char** argv) {
-    int game_running = 0;
-    char player_id[PLID_SIZE];
     int nT = 1;
     
     // Ignore SIGPIPE
     struct sigaction act;
     memset(&act, 0, sizeof act);
     act.sa_handler = SIG_IGN;
-    if(sigaction(SIGPIPE, &act, NULL)==-1) 
+    if(sigaction(SIGPIPE, &act, NULL) == -1 || signal(SIGINT, handle_sigint) == SIG_ERR) 
         exit(1);
 
     player_id[0] = '\0';
@@ -181,7 +193,10 @@ int main(int argc, char** argv) {
     }
 
     free(server_info);
-    close(player_udp_socket);
+    if(close(player_udp_socket) != 0){
+        fprintf(stderr, "Error closing udp socket...\n");
+        exit(1);
+        }
 
     return 0;
 }
