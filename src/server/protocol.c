@@ -45,9 +45,6 @@ int send_message_udp(char message[MSG_SIZE]){
         fprintf(stderr, "Error sending message.\n");
         return -1;
     }
-    if(verbose)
-        fprintf(stdout, "Sent UDP response (%ld bytes): %s", bytes_sent, message);
-    
     return 0;
 }
 
@@ -65,7 +62,8 @@ int read_message_udp(char message[MSG_SIZE]){
     message[bytes_received] = '\0';
     
     if(verbose)
-        fprintf(stdout, "Received UDP request (%ld bytes): %s", bytes_received, message);
+        fprintf(stdout, "Received UDP request (%ld bytes): %sFrom IP: %s and port: %u\n",\
+        bytes_received, message, inet_ntoa(udp_addr.sin_addr), ntohs(udp_addr.sin_port));
     
     return 0;
 }
