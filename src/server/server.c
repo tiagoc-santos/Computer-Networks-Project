@@ -19,12 +19,12 @@ int handle_client_udp(){
     if (!strcmp(op_code, "SNG")){
         reply_start(message_args);
     }
-    /*
+    
     // debug command
     else if (!strcmp(op_code, "DBG")){
         reply_debug(message_args);
     }
-    
+    /*
     // try command
     else if (!strcmp(op_code, "TRY")){
         reply_try(message_args);
@@ -39,12 +39,11 @@ int handle_client_udp(){
     else if (!strcmp(op_code, "SSB")){
         reply_scoreboard(message_args);
     }
-
+    */
     // quit command
     else if (!strcmp(op_code, "QUT")){
         reply_quit(message_args);
     }
-    */
     else{
         char response[MSG_SIZE];
         strcpy(response, "ERR\n");

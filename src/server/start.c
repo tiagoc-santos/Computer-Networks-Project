@@ -1,7 +1,5 @@
 #include "./headers/start.h"
 
-int game_running = 0;
-int nT = 0;
 char secret_key[NUM_COLORS_KEY];
 
 int validate_start(char message_args[ARG_SIZE][CMD_SIZE]) {
@@ -12,22 +10,64 @@ int validate_start(char message_args[ARG_SIZE][CMD_SIZE]) {
 int reply_start(char message_args[ARG_SIZE][CMD_SIZE]){
     char response[MSG_SIZE];
     char filename[GAME_FILENAME_SIZE];
-    char filepath[FILENAME_MAX];
+    char PLID[PLID_SIZE];
+    char secret_key[NUM_COLORS_KEY];
+
     struct tm *current_time;
     time_t fulltime;
 
+    //Checks if the start arguments are correct
     if (validate_start(message_args) != 0){
         strcpy(response, "RSG ERR\n");
         send_message_udp(response);
         return 0;
     }
 
-    if(game_running && nT > 0){
-        strcpy(response, "RSG NOK\n");
-        send_message_udp(response);
-        return 0;
-    }
+    strcpy(PLID, message_args[1]);
+    PLID[6] = '\0';
+    
+    //Checks if the player has a ongoing game
+    if(find_specific_game(PLID, filename) == 1){
+        int timeout = check_timeout(filename);
+        if(timeout == -1){
+            strcpy(response, "ERR\n");
+            send_message_udp(response);
+            return 0;
+        }
+        // if the game has ended due to running out of time moves the file to GAMES/PLID
+        else if(timeout == 1){
+            time(&fulltime);
+            current_time = gmtime(&fulltime);
+            if (add_last_line(filename, current_time, fulltime) != 0){
+                strcpy(response, "ERR\n");
+                send_message_udp(response);
+                return 0;
+            }
 
+            if(move_gamefile(PLID, current_time, 'T', filename) != 0){
+                strcpy(response, "ERR\n");
+                send_message_udp(response);
+                return 0;
+            }
+        }
+        
+        //The game is still playable timewise
+        else {
+            int nT = get_nT(filename);
+            if (nT == -1){
+                strcpy(response, "ERR\n");
+                send_message_udp(response);
+                return 0;
+            }
+            //If the player has done atleast a try
+            else if(nT > 0){
+                strcpy(response, "RSG NOK\n");
+                send_message_udp(response);
+                return 0;
+            }
+        }
+    }
+    
     //initialize random secret key
     char* possible_colors = "RGBYOP";
     int num_colors =  strlen(possible_colors);
@@ -37,10 +77,10 @@ int reply_start(char message_args[ARG_SIZE][CMD_SIZE]){
         int random_index = rand() % num_colors;
         secret_key[i] = possible_colors[random_index];
     }
-    strcpy(filepath, "src/server/GAMES/");
-    sprintf(filename, "GAME_%s.txt", message_args[1]);
-    strcat(filepath, filename);
-    int game_file = open(filepath, O_CREAT || O_TRUNC || O_WRONLY);
+
+    //Create game file
+    sprintf(filename, "src/server/GAMES/GAME_%s.txt", PLID);
+    int game_file = open(filename, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR);
 
     if(game_file == -1){
         strcpy(response, "ERR\n");
@@ -51,7 +91,7 @@ int reply_start(char message_args[ARG_SIZE][CMD_SIZE]){
     char firstline[BUFFER_SIZE];
     time(&fulltime);
     current_time = gmtime(&fulltime); 
-    sprintf(firstline, "%s P %c%c%c%c %s %4d-%02d-%02d %02d:%02d:%02d %ld\n", message_args[1], secret_key[0], 
+    sprintf(firstline, "%s P %c%c%c%c %s %4d-%02d-%02d %02d:%02d:%02d %ld\n", PLID, secret_key[0], 
             secret_key[1], secret_key[2], secret_key[3], message_args[2], current_time->tm_year + 1900,
             current_time->tm_mon+1, current_time->tm_mday, current_time->tm_hour, current_time->tm_min,
             current_time->tm_sec, fulltime);
@@ -75,7 +115,6 @@ int reply_start(char message_args[ARG_SIZE][CMD_SIZE]){
 
     strcpy(response, "RSG OK\n");
     send_message_udp(response);
-    game_running = 1;
     
     return 0;
 }

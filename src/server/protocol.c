@@ -25,7 +25,7 @@ int init_udp_socket(){
     }
 
     if(bind(udp_socket, udp_res->ai_addr, udp_res->ai_addrlen) != 0){
-        fprintf(stderr, "Error while binding\n");
+        fprintf(stderr, "Error while binding: %s\n", strerror(errno));
         return -1;
     }
 
@@ -45,6 +45,9 @@ int send_message_udp(char message[MSG_SIZE]){
         fprintf(stderr, "Error sending message.\n");
         return -1;
     }
+    if(verbose)
+        fprintf(stdout, "SENT UDP response (%ld bytes): %sTo IP: %s and port: %u\n",\
+        bytes_sent, message, inet_ntoa(udp_addr.sin_addr), ntohs(udp_addr.sin_port));
     return 0;
 }
 

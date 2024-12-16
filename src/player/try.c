@@ -65,6 +65,12 @@ int try(char PLID[PLID_SIZE], char c1[CMD_SIZE], char c2[CMD_SIZE], char c3[CMD_
         fprintf(stderr, "Unknown message received\n");
         return -1;
     }
+    
+    if (!strcmp(response, "ERR\n")){
+        fprintf(stderr, "ERR.\n");
+        return -1;
+    }
+
     else{
         char response_args[ARG_SIZE][CMD_SIZE];
         split_line(response, response_args);
