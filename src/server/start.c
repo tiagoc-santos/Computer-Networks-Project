@@ -26,7 +26,7 @@ int reply_start(char message_args[ARG_SIZE][CMD_SIZE]){
     strcpy(PLID, message_args[1]);
     PLID[6] = '\0';
     
-    //Checks if the player has a ongoing game
+    //Checks if the player has an ongoing game
     if(find_specific_game(PLID, filename) == 1){
         int timeout = check_timeout(filename);
         if(timeout == -1){

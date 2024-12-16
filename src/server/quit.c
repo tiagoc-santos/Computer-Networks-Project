@@ -42,7 +42,7 @@ int reply_quit(char message_args[ARG_SIZE][CMD_SIZE]){
     time(&timestamp);
     current_time = gmtime(&timestamp);
 
-    //
+    // Add line with info regarding game ending
     if(add_last_line(filename, current_time, timestamp) != 0){
         strcpy(response, "ERR\n");
         send_message_udp(response);

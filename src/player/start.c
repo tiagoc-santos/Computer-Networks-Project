@@ -8,6 +8,7 @@ int validate_start(char cmd_args[ARG_SIZE][CMD_SIZE]) {
 int start_game(char PLID[PLID_SIZE], char time[ARG_SIZE]){
     char message[MSG_SIZE], response[MSG_SIZE];
     int time_num = atoi(time);
+    
     sprintf(message, "SNG %s %03d\n", PLID, time_num);
     if(send_udp_request(message, strlen(message), player_udp_socket, server_info, response) == -1)
         return -1;

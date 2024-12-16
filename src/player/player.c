@@ -13,6 +13,7 @@ char* server_port = SERVER_PORT_DEFAULT;
 struct addrinfo *server_info;
 char player_id[PLID_SIZE];
 
+// Handles SIGINT
 void handle_sigint(int signal){
     if(game_running){
         if(quit_game(player_id) != 0)
@@ -29,7 +30,7 @@ void handle_sigint(int signal){
 int main(int argc, char** argv) {
     int nT = 1;
     
-    // Ignore SIGPIPE
+    // Ignore SIGPIPE and define handler for SIGINT
     struct sigaction act;
     memset(&act, 0, sizeof act);
     act.sa_handler = SIG_IGN;
@@ -37,6 +38,7 @@ int main(int argc, char** argv) {
         exit(1);
 
     player_id[0] = '\0';
+
     if(argc == 3){
         if (!strcmp(argv[1], "-n")){
             server_IP = argv[2];
@@ -93,6 +95,7 @@ int main(int argc, char** argv) {
             strcpy(player_id, cmd_args[1]);
             player_id[6] = '\0';
             int status = start_game(player_id, cmd_args[2]);
+            
             //ERR has occured
             if(status == -1)
                 break;
@@ -132,6 +135,7 @@ int main(int argc, char** argv) {
                 continue;
             }
             int ret_try = try(player_id, cmd_args[1], cmd_args[2], cmd_args[3], cmd_args[4], &nT);
+            
             // ERR has occurred
             if(ret_try == -1)
                 break;
@@ -144,6 +148,7 @@ int main(int argc, char** argv) {
                     && player_id[0] != '\0'){
             
             int ret_st = show_trials(player_id);
+            
             //ERR has occurred
             if(ret_st == -1)
                 break;
@@ -154,6 +159,7 @@ int main(int argc, char** argv) {
         // scoreboard command
         else if (!strcmp(cmd_args[0], "sb") || !strcmp(cmd_args[0], "scoreboard")){
             int ret_sb = scoreboard();
+            
             //ERR has occurred
             if (ret_sb == -1)
                 break;
@@ -170,6 +176,8 @@ int main(int argc, char** argv) {
                 continue;
             }
             int ret_quit = quit_game(player_id);
+            
+            //ERR has occurred
             if(ret_quit == -1)
                 break;
             else if(ret_quit != 0){
@@ -181,8 +189,13 @@ int main(int argc, char** argv) {
 
         // exit command
         else if (!strcmp(cmd_args[0], "exit")){
+            //If a game is running informs the server
             if(game_running){
-                if(quit_game(player_id) != 0){
+                int ret_exit = quit_game(player_id);
+
+                if(ret_exit == -1)
+                    break;
+                else if(ret_exit != 0){
                     fprintf(stderr, "Unable to exit\n");
                     continue;
                 }
@@ -196,7 +209,7 @@ int main(int argc, char** argv) {
     if(close(player_udp_socket) != 0){
         fprintf(stderr, "Error closing udp socket...\n");
         exit(1);
-        }
+    }
 
     return 0;
 }

@@ -66,6 +66,7 @@ int receive_message_udp(int socket_fd, struct addrinfo* res, char* buffer){
     bytes_received = recvfrom(socket_fd, buffer, MSG_SIZE, 0, (struct sockaddr *)&addr, &addrlen);
     
     if (bytes_received == -1){
+        // Checks for timeout
         if (errno == EAGAIN || errno == EWOULDBLOCK){
             return TIMEOUT;
         }
@@ -86,6 +87,8 @@ int send_udp_request(char* message, int message_size, int socket_fd, struct addr
             return -1;
         }
         ret = receive_message_udp(socket_fd, res, buffer);
+
+        // If connection timeouts
         if (ret != 0){
             if (ret == TIMEOUT){
                 fprintf(stderr, "TIMEOUT trying again...\n");

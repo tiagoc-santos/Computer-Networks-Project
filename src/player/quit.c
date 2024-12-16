@@ -11,11 +11,12 @@ int quit_game(char PLID[PLID_SIZE]){
 
     split_line(response, response_items);
 
+    // If the server answered QUT OK reads the secret key
     if(!strcmp(response_items[1], "OK")){
         sprintf(answer, "%s %s %s %s",response_items[2], response_items[3], response_items[4], response_items[5]);
         fprintf(stdout, "The answer was: %s\n", answer);
     }
-
+    
     else if(!strcmp(response_items[1], "NOK"))
         fprintf(stdout, "There is no game ongoing...\n");
 

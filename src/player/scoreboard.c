@@ -4,6 +4,7 @@ int scoreboard(){
     char message[MSG_SIZE], filename[FILENAME_SIZE], file_contents[FILE_SIZE], filepath[BUFFER_SIZE];
     int status, file, bytes_read;
     strcpy(message, "SSB\n");
+
     status = send_tcp_request(message, filename);
     
     if(status == -1)
@@ -26,7 +27,7 @@ int scoreboard(){
 
     memset(file_contents, 0, sizeof(file_contents));
 
-    // Read the file character by character and build lines
+    // Read the file character by character and write lines
     while ((bytes_read = read(file, file_contents, FILE_SIZE)) > 0) {
         if (bytes_read == -1){
             fprintf(stderr, "Error reading file\n");

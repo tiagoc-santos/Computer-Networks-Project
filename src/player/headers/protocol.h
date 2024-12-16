@@ -3,7 +3,7 @@
 
 #define SERVER_IP_DEFAULT "localhost"
 #define MAX_RESENDS 5
-#define TIMEOUT 1
+#define TIMEOUT 4
 
 
 #include <sys/socket.h>
