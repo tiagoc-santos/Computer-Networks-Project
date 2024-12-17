@@ -16,5 +16,10 @@ int validate_try(char cmd_args[ARG_SIZE][CMD_SIZE]){
 }
 
 int reply_try(char message_args[ARG_SIZE][CMD_SIZE]){
+    int nw, nb;
     return 0;
+}
+
+int check_nwhite_nblack(char guessed_key[NUM_COLORS_KEY], int *nw, int *nb){
+    
 }
