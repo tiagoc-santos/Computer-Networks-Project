@@ -2,9 +2,9 @@
 
 char* port = SERVER_PORT_DEFAULT;
 int udp_socket, tcp_socket,verbose = 0;
-socklen_t udp_addrlen;
-struct addrinfo* udp_res;
-struct sockaddr_in udp_addr;
+socklen_t udp_addrlen, tcp_addrlen;
+struct addrinfo *udp_res, *tcp_res;
+struct sockaddr_in udp_addr, tcp_addr;
 
 /*---------------------------------UDP---------------------------------*/
 
@@ -14,6 +14,11 @@ int init_udp_socket(){
 
     udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
 
+    if(udp_socket == -1){
+        fprintf(stderr, "Error creating udp socket\n");
+        return -1;
+    }
+        
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_DGRAM;
@@ -29,11 +34,6 @@ int init_udp_socket(){
         return -1;
     }
 
-    return 0;
-}
-
-//TO-DO
-int init_tcp_socket(){
     return 0;
 }
 
@@ -77,3 +77,39 @@ int close_udp_socket(){
         return -1;
     return 0;
 }
+
+/*------------------------- TCP Requests -------------------------*/
+
+int init_tcp_socket() {
+    struct addrinfo hints;
+    int errcode;
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+
+    if ((errcode = getaddrinfo(NULL, port, &hints, &tcp_res)) != 0){
+        fprintf(stderr,"error: getaddrinfo: %s\n", gai_strerror(errcode));
+        return -1;
+    }
+
+    tcp_socket = socket(tcp_res->ai_family, tcp_res->ai_socktype, tcp_res->ai_protocol);
+    if (tcp_socket == -1){
+        fprintf(stderr, "Error creating tcp socket\n");
+        return -1;
+    }
+
+    if(bind(tcp_socket, tcp_res->ai_addr,tcp_res->ai_addrlen) != 0){
+        fprintf(stderr, "Binding error: %s\n", strerror(errno));
+        return -1;
+    }
+    
+    if(listen(tcp_socket, 5) == -1){
+        fprintf(stderr, "Listening error: %s\n", strerror(errno));
+        return -1;
+    }
+
+    return 0;
+}
+

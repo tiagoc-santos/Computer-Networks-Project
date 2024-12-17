@@ -56,15 +56,21 @@ int reply_quit(char message_args[ARG_SIZE][CMD_SIZE]){
         return 0;
     }
 
-    sprintf(response, "RTQ OK %c %c %c %c\n", secret_key[0], secret_key[1], secret_key[2], secret_key[3]);
-    send_message_udp(response);
-
     // Move gamefile to directory GAMES/PLID
     if(move_gamefile(PLID, current_time, code, filename) != 0){
         strcpy(response, "RQT ERR\n");
         send_message_udp(response);
         return 0;
     }
+
+    if(code == 'T'){
+        strcpy(response, "RQT NOK\n");
+        send_message_udp(response);
+        return 0;
+    }
+
+    sprintf(response, "RQT OK %c %c %c %c\n", secret_key[0], secret_key[1], secret_key[2], secret_key[3]);
+    send_message_udp(response);
 
     return 0;
 }

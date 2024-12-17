@@ -24,12 +24,12 @@ int handle_client_udp(){
     else if (!strcmp(op_code, "DBG")){
         reply_debug(message_args);
     }
-    /*
+    
     // try command
     else if (!strcmp(op_code, "TRY")){
         reply_try(message_args);
     }
-
+    /*
     // show trials command
     else if (!strcmp(op_code, "STR")){
         reply_showtrials(message_args);
@@ -50,6 +50,11 @@ int handle_client_udp(){
         send_message_udp(response);    
     }
     return 0;
+}
+
+int handle_client_tcp(){
+    return 0;
+    //pid_t pid = fork();
 }
 
 int main(int argc, char** argv){
@@ -94,10 +99,9 @@ int main(int argc, char** argv){
     if(init_udp_socket() == -1)
         return -1;
     
-    //TO-DO define function
-    /*if(init_tcp_socket() == -1)
+    if(init_tcp_socket() == -1)
         return -1;
-    */
+    
     // File descriptor for select
     fd_set read_file_descriptors;
     
@@ -117,9 +121,13 @@ int main(int argc, char** argv){
             fprintf(stderr, "select error\n");
             break;
         }
+
         //If UDP socket is ready
         if(FD_ISSET(udp_socket, &read_file_descriptors))
             handle_client_udp();
+
+        if(FD_ISSET(tcp_socket, &read_file_descriptors))
+            handle_client_tcp();
     }
 
     if(close_udp_socket() != 0)

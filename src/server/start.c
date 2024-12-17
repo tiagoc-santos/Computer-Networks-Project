@@ -8,11 +8,8 @@ int validate_start(char message_args[ARG_SIZE][CMD_SIZE]) {
 }
 
 int reply_start(char message_args[ARG_SIZE][CMD_SIZE]){
-    char response[MSG_SIZE];
-    char filename[GAME_FILENAME_SIZE];
-    char PLID[PLID_SIZE];
-    char secret_key[NUM_COLORS_KEY];
-
+    char response[MSG_SIZE], filename[GAME_FILENAME_SIZE];
+    char PLID[PLID_SIZE], secret_key[NUM_COLORS_KEY];
     struct tm *current_time;
     time_t fulltime;
 

@@ -62,12 +62,12 @@ int try(char PLID[PLID_SIZE], char c1[CMD_SIZE], char c2[CMD_SIZE], char c3[CMD_
     }
     
     if(!strcmp(response, "RTR ERR\n")){
-        fprintf(stderr, "Unknown message received\n");
+        fprintf(stderr, "Invalid try syntax\n");
         return -1;
     }
     
     if (!strcmp(response, "ERR\n")){
-        fprintf(stderr, "ERR.\n");
+        fprintf(stderr, "Erro fatal! Jogo encerrado!\n");
         return -1;
     }
 
