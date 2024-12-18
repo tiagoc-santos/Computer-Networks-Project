@@ -11,7 +11,7 @@ int reply_showtrials(int socket, char message_args[ARG_SIZE][CMD_SIZE]){
     
     // Checks if the arguments are correct
     if(validate_st(message_args) != 0){
-        strcpy(response, "ERR3\n");
+        strcpy(response, "ERR\n");
         send_tcp_message(socket, response, 0, NULL, NULL);
         return 0;
     }
@@ -33,7 +33,7 @@ int reply_showtrials(int socket, char message_args[ARG_SIZE][CMD_SIZE]){
     sprintf(fname, "STATE_%s.txt", PLID);
     if(active_game){
         if (read_tries('A', agfilename, fcontents, &fsize) == -1){
-            strcpy(response, "ERR1\n");
+            strcpy(response, "ERR\n");
             send_tcp_message(socket, response, 0, NULL, NULL);
             return 0;
         }
@@ -42,7 +42,7 @@ int reply_showtrials(int socket, char message_args[ARG_SIZE][CMD_SIZE]){
     }
     else if (finished_game){
         if (read_tries('F', fgfilename, fcontents, &fsize) == -1){
-            strcpy(response, "ERR2\n");
+            strcpy(response, "ERR\n");
             send_tcp_message(socket, response, 0, NULL, NULL);
             return 0;
         }

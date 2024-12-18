@@ -229,7 +229,7 @@ int read_tries(char status, char filename[GAME_FILENAME_SIZE], char fcontents[FI
     int bytes_written, nB, nW, remaining_time;
     char guess_code[NUM_COLORS_KEY];
     time_t start_time, current_time;
-    int last_line = 0, duration;
+    int last_line = 0, duration, max_time;
     
     if (file == NULL) {
         return -1;
@@ -238,7 +238,7 @@ int read_tries(char status, char filename[GAME_FILENAME_SIZE], char fcontents[FI
     char line[256];
 
     fgets(line, sizeof(line), file);
-    if(sscanf(line, "%*s %*s %*s %*s %*s %*s %ld", &start_time) != 1){
+    if(sscanf(line, "%*s %*s %*s %d %*s %*s %ld", &max_time, &start_time) != 2){
         fclose(file);
         return -1;
     }
@@ -270,7 +270,7 @@ int read_tries(char status, char filename[GAME_FILENAME_SIZE], char fcontents[FI
 
     if(status == 'A'){
         time(&current_time);
-        remaining_time = (int)(current_time - start_time);
+        remaining_time = max_time - (int)(current_time - start_time);
         if ((bytes_written = sprintf(ptr, "You still have %d seconds to guess the secret key!\n", remaining_time)) < 0){
             fprintf(stderr, "Error writing to buffer.\n");
             fclose(file);

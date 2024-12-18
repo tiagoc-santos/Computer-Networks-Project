@@ -23,7 +23,6 @@ int reply_scoreboard(int socket, char message_args[ARG_SIZE][CMD_SIZE]){
     for (i = 0; i < n_scores; i++){
         if ((bytes_written = sprintf(ptr, "%s %c%c%c%c %d\n", score_list.PLID[i], score_list.color_code[i][0],
             score_list.color_code[i][1], score_list.color_code[i][2], score_list.color_code[i][3], score_list.no_tries[i])) < 0){
-            fprintf(stderr, "Error writing to buffer.\n");
             strcpy(response, "ERR\n");
             send_tcp_message(socket, response, 0, NULL, NULL);
             return 0;
