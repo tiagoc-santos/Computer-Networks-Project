@@ -26,5 +26,7 @@ clean:
 	rm -f $(TARGET) $(OBJS)
 	rm -rf $(OBJ_DIR)
 	rm -rf ./common
+	rm -rf ./GAMES/*
+	rm -rf ./SCORES/*.txt
 
 .PHONY: clean
