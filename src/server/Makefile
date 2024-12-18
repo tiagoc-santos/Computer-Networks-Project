@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -g -Wall
 
 TARGET_DIR = ../..
-TARGET = $(TARGET_DIR)/server
+TARGET = $(TARGET_DIR)/GS
 
 SRC_DIRS = . ../common
 SRCS = $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))

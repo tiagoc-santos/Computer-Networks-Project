@@ -46,7 +46,7 @@ int send_message_udp(char message[MSG_SIZE]){
         return -1;
     }
     if(verbose)
-        fprintf(stdout, "SENT UDP response (%ld bytes): %sTo IP: %s and port: %u\n",\
+        fprintf(stdout, "Sent UDP response (%ld bytes): %sTo IP: %s and port: %u\n",\
         bytes_sent, message, inet_ntoa(udp_addr.sin_addr), ntohs(udp_addr.sin_port));
     return 0;
 }
@@ -89,7 +89,7 @@ int init_tcp_socket() {
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    if ((errcode = getaddrinfo(NULL, port, &hints, &tcp_res)) != 0){
+    if ((errcode = getaddrinfo("localhost", port, &hints, &tcp_res)) != 0){
         fprintf(stderr,"error: getaddrinfo: %s\n", gai_strerror(errcode));
         return -1;
     }
@@ -113,3 +113,92 @@ int init_tcp_socket() {
     return 0;
 }
 
+int connect_client(){
+    int socket = accept(tcp_socket, (struct sockaddr *) &tcp_addr, &tcp_addrlen);
+    
+    if(socket == -1)
+        return -1;
+
+    /*Set timeout for operations*/
+    struct timeval timeout;
+    timeout.tv_sec = 5; // 5 second tieout
+    timeout.tv_usec = 0;
+
+    if(setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (char *) &timeout, sizeof(timeout)) != 0){
+        fprintf(stderr, "connect_client: Error setting timeout;: %s\n", strerror(errno));
+        close(socket);
+        return -1;
+    }
+    
+    return socket;
+}
+
+int read_message_tcp(int socket, char message[MSG_SIZE]){
+    int i = 0, nread = 0;
+    char buffer[MSG_SIZE];
+
+    memset(message, 0, MSG_SIZE);
+
+    while(1) {
+        nread = read(socket,buffer, 1);
+        
+        if(nread == -1){
+            return -1;
+        }
+        
+        else if(buffer[0] == '\n'){
+            message[i++] = buffer[0];
+            break;
+        }
+
+        message[i++] = buffer[0];
+    }
+    message[i] = '\0';
+
+    if(verbose)
+        fprintf(stdout, "Received TCP request (%ld bytes) %sFrom IP: %s and port: %u\n",\
+        strlen(message), message, inet_ntoa(tcp_addr.sin_addr), ntohs(tcp_addr.sin_port));
+
+    return 0;
+}
+
+int send_tcp_message(int socket, char response[MSG_SIZE], int fsize, 
+                        char fname[FILENAME_SIZE], char fcontents[FILE_SIZE]){
+    
+    char* ptr, buffer[BUFFER_SIZE], message[BUFFER_SIZE];
+    int nbytes, nwritten;
+    int nleft;
+
+    if(fsize != 0){
+        sprintf(message, "%s %s %d %s\n", response, fname, fsize, fcontents);
+    }
+    else{
+        sprintf(message, "%s", response);
+    }
+
+    nbytes = strlen(message);
+    nleft = nbytes;
+    ptr = strcpy(buffer, message);
+    
+    while(nleft > 0){
+        nwritten = write(socket, ptr, nleft);
+        if(nwritten == -1){
+            return -1;
+        }
+        nleft -= nwritten;
+        ptr += nwritten;
+    }
+
+    if(verbose){
+        if(fsize == 0){
+            fprintf(stdout, "Sent TCP response (%d bytes): %sTo IP: %s and port: %u\n",\
+            nwritten, message, inet_ntoa(tcp_addr.sin_addr), ntohs(tcp_addr.sin_port));
+        }
+        else{
+            fprintf(stdout, "Sent TCP response (%d bytes): \"%s\"\nTo IP: %s and port: %u\n",\
+            nwritten, fname, inet_ntoa(tcp_addr.sin_addr), ntohs(tcp_addr.sin_port));
+        }
+    }
+
+    return 0;
+}

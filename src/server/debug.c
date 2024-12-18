@@ -35,7 +35,7 @@ int reply_debug(char message_args[ARG_SIZE][CMD_SIZE]){
     PLID[6] = '\0';
     
     //Checks if the player has a ongoing game
-    if(find_specific_game(PLID, filename) == 1){
+    if(find_active_game(PLID, filename) == 1){
         int timeout = check_timeout(filename);
         if(timeout == -1){
             strcpy(response, "ERR\n");

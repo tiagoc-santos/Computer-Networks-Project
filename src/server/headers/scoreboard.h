@@ -4,6 +4,6 @@
 #include "protocol.h"
 #include "command_utils.h"
 
-int reply_scoreboard(char message_args[ARG_SIZE][CMD_SIZE]);
+int reply_scoreboard(int socket, char message_args[ARG_SIZE][CMD_SIZE]);
 
 #endif

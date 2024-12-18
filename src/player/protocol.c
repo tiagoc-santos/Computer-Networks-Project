@@ -244,9 +244,10 @@ int read_file_tcp(int tcp_socket, char filename[FILENAME_SIZE]){
             fprintf(stderr, "Error reading file data.\n");
             return -1;
         }
+
         if (bytes_read == 0 || fsize == 0)
             break;
-
+        
         int aux = 0;
         while (bytes_written < bytes_read){
             bytes_written = write(file, buffer, bytes_read);
@@ -277,17 +278,24 @@ int send_tcp_request(char message[MSG_SIZE], char filename[FILENAME_SIZE]){
     if (get_server_info(&server_info_tcp, server_IP, server_port, 0) != 0)
         return -1;
 
-    if(connect_server(tcp_socket, server_info_tcp) != 0)
+    if(connect_server(tcp_socket, server_info_tcp) != 0){
+        free(server_info_tcp);
         return -1;
-
-    if(write_message_tcp(tcp_socket, message) != 0)
+    }
+        
+    if(write_message_tcp(tcp_socket, message) != 0){
+        free(server_info_tcp);
         return -1;
+    }
 
     int status = read_file_tcp(tcp_socket, filename);
     if(close(tcp_socket) != 0){
+        free(server_info_tcp);
         fprintf(stderr, "Error closing tcp connection.\n");
         return -1;
     }
+    
+    free(server_info_tcp);
 
     return status;
 }

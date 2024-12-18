@@ -6,8 +6,8 @@
 #define MSG_SIZE 50
 #define PLID_SIZE 7
 #define OPCODE_SIZE 3
-#define BUFFER_SIZE 2048
-#define FILE_SIZE 1024
+#define BUFFER_SIZE 4096
+#define FILE_SIZE 2048
 #define SIZE_COLORS 8
 #define FILENAME_SIZE 24
 #define SERVER_PORT_DEFAULT "58019"

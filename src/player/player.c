@@ -92,6 +92,11 @@ int main(int argc, char** argv) {
                 continue;
             }
 
+            if(strcmp(player_id, cmd_args[1]) && game_running){
+                fprintf(stderr, "There's another player already playing\n");
+                continue;
+            }
+
             strcpy(player_id, cmd_args[1]);
             player_id[6] = '\0';
             int status = start_game(player_id, cmd_args[2]);
@@ -112,6 +117,12 @@ int main(int argc, char** argv) {
                 fprintf(stderr, "Invalid command.\n");
                 continue;
             }
+
+            if(strcmp(player_id, cmd_args[1]) && game_running){
+                fprintf(stderr, "There's another player already playing\n");
+                continue;
+            }
+            
             char colors[SIZE_COLORS];
             sprintf(colors, "%c %c %c %c", cmd_args[3][0], cmd_args[4][0], cmd_args[5][0], cmd_args[6][0]);
             strcpy(player_id, cmd_args[1]);
@@ -202,6 +213,10 @@ int main(int argc, char** argv) {
                 game_running = 0;
             }
             break;
+        }
+        else{
+            fprintf(stderr, "Invalid command.\n");
+            continue;
         }
     }
 

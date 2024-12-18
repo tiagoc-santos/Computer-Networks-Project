@@ -29,21 +29,12 @@ int handle_client_udp(){
     else if (!strcmp(op_code, "TRY")){
         reply_try(message_args);
     }
-    /*
-    // show trials command
-    else if (!strcmp(op_code, "STR")){
-        reply_showtrials(message_args);
-    }
 
-    // scoreboard command
-    else if (!strcmp(op_code, "SSB")){
-        reply_scoreboard(message_args);
-    }
-    */
     // quit command
     else if (!strcmp(op_code, "QUT")){
         reply_quit(message_args);
     }
+
     else{
         char response[MSG_SIZE];
         strcpy(response, "ERR\n");
@@ -53,16 +44,61 @@ int handle_client_udp(){
 }
 
 int handle_client_tcp(){
+    pid_t pid = fork();
+
+    if(pid == -1){
+        fprintf(stderr, "handle_client_tcp: Error forking:%s\n", strerror(errno));
+        return -1;
+    }
+
+    // Parent process
+    if(pid != 0)
+        return 0;
+
+    int socket = connect_client();
+    if(socket == -1){
+        fprintf(stderr, "handle_tcp_client: Error connectiong to client\n");
+        return -1;
+    }
+
+    char message[MSG_SIZE], message_args[ARG_SIZE][CMD_SIZE];
+    
+    if(read_message_tcp(socket, message) == -1){
+        fprintf(stderr, "handle_tcp_client: Error reading from client.\n");
+        return -1;
+    }
+
+    split_line(message, message_args);
+    char* op_code = message_args[0];
+
+    // show trials command
+    if (!strcmp(op_code, "STR")){
+        reply_showtrials(socket, message_args);
+    }
+    
+    // scoreboard command
+    else if (!strcmp(op_code, "SSB")){
+        reply_scoreboard(socket, message_args);
+    }
+
+    else{
+        char response[MSG_SIZE];
+        strcpy(response, "ERR1\n");
+        send_tcp_message(socket, response, 0, NULL, NULL);
+    }
+    
+    close(socket);
     return 0;
-    //pid_t pid = fork();
 }
 
 int main(int argc, char** argv){
-    // Ignore SIGPIPE
+
+    // Ignore SIGPIPE and SIGCHILD
     struct sigaction act;
     memset(&act, 0, sizeof act);
     act.sa_handler = SIG_IGN;
-    if(sigaction(SIGPIPE, &act, NULL) == -1) 
+    if((sigaction(SIGPIPE, &act, NULL) == -1) || 
+        (sigaction(SIGCHLD, &act, NULL) == -1))
         exit(1);
 
     if(argc == 2){
@@ -112,7 +148,7 @@ int main(int argc, char** argv){
         FD_SET(udp_socket, &read_file_descriptors);
 
         //Add TCP socket to set
-        FD_SET(udp_socket, &read_file_descriptors);
+        FD_SET(tcp_socket, &read_file_descriptors);
         
         int max_fd = (udp_socket > tcp_socket) ? udp_socket : tcp_socket;
         int counter = select(max_fd + 1, &read_file_descriptors, (fd_set*)NULL,(fd_set*)NULL,(struct timeval *)NULL);

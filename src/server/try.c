@@ -36,7 +36,7 @@ int reply_try(char message_args[ARG_SIZE][CMD_SIZE]){
     PLID[6] = '\0';
 
     //Checks if the player has an ongoing game
-    if(find_specific_game(PLID, filename) == 1){
+    if(find_active_game(PLID, filename) == 1){
         int timeout = check_timeout(filename);
         if(timeout == -1){
             strcpy(response, "ERR\n");
@@ -54,13 +54,20 @@ int reply_try(char message_args[ARG_SIZE][CMD_SIZE]){
                 send_message_udp(response);
                 return 0;
             }
-
+            
+            if(get_secret_key(filename, secret_key) != 0){
+                strcpy(response, "ERR\n");
+                send_message_udp(response);
+                return 0;
+            }
+            
             if(move_gamefile(PLID, current_time, 'T', filename) != 0){
                 strcpy(response, "ERR\n");
                 send_message_udp(response);
                 return 0;
             }
-            strcpy(response, "RTR EMT\n");
+
+            sprintf(response, "RTR ETM %c %c %c %c\n", secret_key[0], secret_key[1], secret_key[2], secret_key[3]);
             send_message_udp(response);
             return 0;
         }

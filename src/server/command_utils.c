@@ -1,6 +1,6 @@
 #include "./headers/command_utils.h"
 
-int find_specific_game(char PLID[PLID_SIZE], char filename[GAME_FILENAME_SIZE]){
+int find_active_game(char PLID[PLID_SIZE], char filename[GAME_FILENAME_SIZE]){
     struct dirent **filelist;
     int n_entries;
     char target_filename[GAME_FILENAME_SIZE];
@@ -224,6 +224,85 @@ int check_same_last_try(char filename[GAME_FILENAME_SIZE], char guess[4]){
     return !strcmp(recorded_guess, guess);
 }
 
+int read_tries(char status, char filename[GAME_FILENAME_SIZE], char fcontents[FILE_SIZE], int *fsize){
+    FILE *file = fopen(filename, "r");
+    int bytes_written, nB, nW, remaining_time;
+    char guess_code[NUM_COLORS_KEY];
+    time_t start_time, current_time;
+    int last_line = 0, duration;
+    
+    if (file == NULL) {
+        return -1;
+    }
+
+    char line[256];
+
+    fgets(line, sizeof(line), file);
+    if(sscanf(line, "%*s %*s %*s %*s %*s %*s %ld", &start_time) != 1){
+        fclose(file);
+        return -1;
+    }
+
+    char *ptr = fcontents;
+    while (fgets(line, sizeof(line), file)) {
+        // Check if the line starts with 'T:'
+        if (line[0] == 'T' && line[1] == ':') {
+            last_line = 1;
+            if(sscanf(line, "%*s %s %d %d %*s", guess_code, &nB, &nW) != 3){
+                fclose(file);
+                return -1;
+            }
+            if ((bytes_written = sprintf(ptr, "T: %c %c %c %c nB: %d nW: %d\n", guess_code[0],
+                    guess_code[1], guess_code[2], guess_code[3], nB, nW)) < 0){
+                fclose(file);
+                return -1;
+            }
+            ptr += bytes_written;
+        }
+        else if (last_line == 1){
+            if(sscanf(line, "%*s %*s %d", &duration) != 1){
+                fclose(file);
+                return -1;
+            }
+            break;
+        }
+    }
+
+    if(status == 'A'){
+        time(&current_time);
+        remaining_time = (int)(current_time - start_time);
+        if ((bytes_written = sprintf(ptr, "You still have %d seconds to guess the secret key!\n", remaining_time)) < 0){
+            fprintf(stderr, "Error writing to buffer.\n");
+            fclose(file);
+            return -1;
+        }
+    }
+    else if(status == 'F'){
+        if (last_line == 0){
+            if ((bytes_written = sprintf(ptr, "No attempts were made.\n")) < 0){
+                fprintf(stderr, "Error writing to buffer.\n");
+                fclose(file);
+                return -1;
+            }
+        }
+        else{
+            if ((bytes_written = sprintf(ptr, "The game lasted %d seconds.\n", duration)) < 0){
+                fprintf(stderr, "Error writing to buffer.\n");
+                fclose(file);
+                return -1;
+            }
+        } 
+    }
+
+    ptr += bytes_written;
+    *fsize = ptr - fcontents;
+
+    if(fclose(file) == -1)
+        return -1;
+
+    return 0;
+}
+
 void check_guess(char guessed_key[NUM_COLORS_KEY], char secret_key[NUM_COLORS_KEY], int *nB, int *nW){
     int blacks = 0, count = 0;
     int key[6] = {0,0,0,0,0,0};
@@ -344,11 +423,11 @@ int create_score_file(char filename[GAME_FILENAME_SIZE], char PLID[PLID_SIZE], c
     if(score_file == NULL)
         return -1;
 
-    if(M == 'P'){
+    if(M == MODE_PLAY){
         strcpy(mode, "PLAY");
         mode[5] = '\0';
     }
-    else if (M == 'D'){
+    else if (M == MODE_DEBUG){
         strcpy(mode, "DEBUG");
         mode[6] = '\0';
     }
@@ -374,4 +453,73 @@ int get_score(int nT, int time){
     double time_d = (double) time;
     int score = (int) (20.0 * ((600.0-time_d)/600.0) + 80.0 * ((8.0-nT_d+1.0)/8.0));
     return score;
+}
+
+int find_last_game(char PLID[PLID_SIZE], char fname[GAME_FILENAME_SIZE]){
+    struct dirent **filelist;
+    int n_entries, found;
+    char dirname[30];
+
+    sprintf(dirname, "src/server/GAMES/%s", PLID);
+    n_entries = scandir(dirname, &filelist, 0 , alphasort);
+    found = 0;
+
+    if (n_entries <= 0)
+        return 0;
+    else{
+        while (n_entries--){
+            if (filelist[n_entries]->d_name[0] != '.' && !found){
+                sprintf(fname, "src/server/GAMES/%s/%s", PLID, filelist[n_entries]->d_name);
+                found = 1;
+            }
+            free(filelist[n_entries]);
+        }
+        free(filelist);
+    }
+    return found;
+}
+
+int find_top_scores(SCORELIST *list){
+    struct dirent **filelist;
+    int n_entries, i_file;
+    char fname[GAME_FILENAME_SIZE];
+    FILE *fp;
+    char mode[MODE_CHAR_SIZE];
+
+    n_entries = scandir("src/server/SCORES", &filelist, 0, alphasort);
+
+    if (n_entries <= 0)
+        return 0;
+    else{
+        i_file = 0;
+        while (n_entries--){
+            if (filelist[n_entries]->d_name[0] != '.' && i_file < 10){
+                sprintf(fname, "src/server/SCORES/%s", filelist[n_entries]->d_name);
+                fp = fopen(fname, "r");
+                if (fp == NULL)
+                    fprintf(stderr, "Error opening file\n");
+                else{
+                    fscanf(fp, "%d %s %s %d %s", &list->score[i_file], list->PLID[i_file], list->color_code[i_file],
+                            &list->no_tries[i_file], mode);
+                    
+                    if(!strcmp(mode, "PLAY"))
+                        list->mode[i_file] = MODE_PLAY;
+                    else if(!strcmp(mode, "DEBUG"))
+                        list->mode[i_file] = MODE_DEBUG;
+
+                    if(fclose(fp) == -1){
+                        fprintf(stderr, "Error closing file\n");
+                        free(filelist[n_entries]);
+                        free(filelist);
+                        return -1;
+                    }
+                    i_file++;
+                }
+            }
+            free(filelist[n_entries]);
+        }
+        free(filelist);
+    }
+    list->n_scores = i_file;
+    return(i_file);
 }

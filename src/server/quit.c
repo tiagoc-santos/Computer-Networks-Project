@@ -20,7 +20,7 @@ int reply_quit(char message_args[ARG_SIZE][CMD_SIZE]){
     PLID[6] = '\0';
 
     //The player has no active game
-    if(!find_specific_game(PLID, filename)){
+    if(!find_active_game(PLID, filename)){
         strcpy(response, "RQT NOK\n");
         send_message_udp(response);
         return 0;
