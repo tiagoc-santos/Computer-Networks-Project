@@ -101,6 +101,8 @@ int main(int argc, char** argv){
         (sigaction(SIGCHLD, &act, NULL) == -1))
         exit(1);
 
+    //TODO: handle SIGINT
+
     if(argc == 2){
         if (!strcmp(argv[1], "-v")){
             verbose = 1;
@@ -158,10 +160,11 @@ int main(int argc, char** argv){
             break;
         }
 
-        //If UDP socket is ready
+        // If UDP socket is ready
         if(FD_ISSET(udp_socket, &read_file_descriptors))
             handle_client_udp();
 
+        // If TCP socket is ready
         if(FD_ISSET(tcp_socket, &read_file_descriptors))
             handle_client_tcp();
     }
