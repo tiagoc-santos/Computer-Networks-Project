@@ -184,7 +184,7 @@ int reply_try(char message_args[ARG_SIZE][CMD_SIZE]){
                 }
             }
 
-            sprintf(response, "RTR OK %d %d %d\n", nT, nB, nW);
+            sprintf(response, "RTR OK %d %d %d\n", nT + 1, nB, nW);
             send_message_udp(response);
 
             return 0;
