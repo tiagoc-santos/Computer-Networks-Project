@@ -19,10 +19,11 @@ int validate_try(char message_args[ARG_SIZE][CMD_SIZE]){
 
 int reply_try(char message_args[ARG_SIZE][CMD_SIZE]){
     char response[MSG_SIZE], PLID[PLID_SIZE], filename[GAME_FILENAME_SIZE];
-    char guess[NUM_COLORS_KEY+1], secret_key[NUM_COLORS_KEY];
+    char guess[NUM_COLORS_KEY+1], secret_key[NUM_COLORS_KEY + 1];
     int nB, nW;
     struct tm *current_time;
     time_t fulltime, timestamp;
+
     
 
     if(validate_try(message_args) != 0){
@@ -102,11 +103,11 @@ int reply_try(char message_args[ARG_SIZE][CMD_SIZE]){
                 send_message_udp(response);
                 return 0;
             }
-
+ 
             //failed last attempt. Game ends on a loss
-            if (current_try == 8 && strcmp(secret_key, guess)){
+            check_guess(guess, secret_key, &nB, &nW);
+            if (current_try == 8 && nB != 4){
                 char code = 'F';
-                
                 time(&timestamp);
                 current_time = gmtime(&timestamp);
                 

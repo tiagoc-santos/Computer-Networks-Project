@@ -27,7 +27,7 @@ int get_nT(char filename[GAME_FILENAME_SIZE]);
 int move_gamefile(char PLID[PLID_SIZE], struct tm* current_time, char code, char filename[GAME_FILENAME_SIZE]);
 int get_secret_key(char filename[GAME_FILENAME_SIZE], char secret_key[NUM_COLORS_KEY]);
 int add_last_line(char filename[GAME_FILENAME_SIZE], struct tm *current_time, time_t timestamp);
-void check_guess(char guessed_key[NUM_COLORS_KEY], char secret_key[NUM_COLORS_KEY],int *nw, int *nb);
+void check_guess(char guessed_key[NUM_COLORS_KEY], char secret_key[NUM_COLORS_KEY], int *nB, int *nW);
 int check_same_try(char filename[GAME_FILENAME_SIZE], char guess[4]);
 int check_same_last_try(char filename[GAME_FILENAME_SIZE], char guess[4]);
 int read_tries(char status, char filename[GAME_FILENAME_SIZE], char fcontents[FILE_SIZE], int *fsize);

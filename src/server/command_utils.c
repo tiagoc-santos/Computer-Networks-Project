@@ -176,7 +176,7 @@ int add_last_line(char filename[GAME_FILENAME_SIZE], struct tm *current_time, ti
 
 int check_same_try(char filename[GAME_FILENAME_SIZE], char guess[4]){
     FILE *file = fopen(filename, "r");
-    char recorded_guess[NUM_COLORS_KEY];
+    char recorded_guess[NUM_COLORS_KEY + 1];
     
     if (file == NULL) {
         return -1;
@@ -202,7 +202,7 @@ int check_same_try(char filename[GAME_FILENAME_SIZE], char guess[4]){
 
 int check_same_last_try(char filename[GAME_FILENAME_SIZE], char guess[4]){
     FILE *file = fopen(filename, "r");
-    char recorded_guess[NUM_COLORS_KEY];
+    char recorded_guess[NUM_COLORS_KEY + 1];
     
     if (file == NULL) {
         return -1;
@@ -313,6 +313,7 @@ void check_guess(char guessed_key[NUM_COLORS_KEY], char secret_key[NUM_COLORS_KE
         if(guessed_key[i] == secret_key[i])
             blacks += 1;
     }
+
     for (i = 0; i < 4; i++){
         switch (guessed_key[i]){
             case 'R':
@@ -425,11 +426,11 @@ int create_score_file(char filename[GAME_FILENAME_SIZE], char PLID[PLID_SIZE], c
 
     if(M == MODE_PLAY){
         strcpy(mode, "PLAY");
-        mode[5] = '\0';
+        mode[4] = '\0';
     }
     else if (M == MODE_DEBUG){
         strcpy(mode, "DEBUG");
-        mode[6] = '\0';
+        mode[5] = '\0';
     }
         
 

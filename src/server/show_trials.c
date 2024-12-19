@@ -17,7 +17,7 @@ int reply_showtrials(int socket, char message_args[ARG_SIZE][CMD_SIZE]){
     }
 
     strcpy(PLID, message_args[1]);
-    PLID[PLID_SIZE] = '\0';
+    PLID[PLID_SIZE - 1] = '\0';
 
     active_game = find_active_game(PLID, agfilename);
     finished_game = find_last_game(PLID, fgfilename);
