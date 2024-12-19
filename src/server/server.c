@@ -6,10 +6,10 @@
 #include "headers/show_trials.h"
 #include "headers/scoreboard.h"
 
+int open_socket;
+
 void handle_sigint(int signal){
-    //TO DO
-    //tem de fechar eventuais conexões TCP ainda ativas
-    
+    close(open_socket);
 }
 
 int handle_client_udp(){
@@ -49,7 +49,8 @@ int handle_client_udp(){
     return 0;
 }
 
-int handle_client_tcp(){
+int handle_client_tcp()
+    {
     pid_t pid = fork();
 
     if(pid == -1){
@@ -61,15 +62,23 @@ int handle_client_tcp(){
     if(pid != 0)
         return 0;
 
-    int socket = connect_client();
-    if(socket == -1){
+    open_socket = connect_client();
+
+    struct sigaction act;
+    // Handle SIGINT
+    memset(&act, 0, sizeof act);
+    act.sa_handler = handle_sigint;
+    if (sigaction(SIGINT, &act, NULL) == -1) 
+        exit(1);
+
+    if(open_socket == -1){
         fprintf(stderr, "handle_tcp_client: Error connectiong to client\n");
         return -1;
     }
 
     char message[MSG_SIZE], message_args[ARG_SIZE][CMD_SIZE];
     
-    if(read_message_tcp(socket, message) == -1){
+    if(read_message_tcp(open_socket, message) == -1){
         fprintf(stderr, "handle_tcp_client: Error reading from client.\n");
         return -1;
     }
@@ -79,33 +88,33 @@ int handle_client_tcp(){
 
     // show trials command
     if (!strcmp(op_code, "STR")){
-        reply_showtrials(socket, message_args);
+        reply_showtrials(open_socket, message_args);
     }
     
     // scoreboard command
     else if (!strcmp(op_code, "SSB")){
-        reply_scoreboard(socket, message_args);
+        reply_scoreboard(open_socket, message_args);
     }
 
     else{
         char response[MSG_SIZE];
         strcpy(response, "ERR\n");
-        send_tcp_message(socket, response, 0, NULL, NULL);
+        send_tcp_message(open_socket, response, 0, NULL, NULL);
     }
     
-    close(socket);
+    close(open_socket);
     return 0;
 }
 
 int main(int argc, char** argv){
 
-    // Ignore SIGPIPE and SIGCHILD and handle SIGINT properly
     struct sigaction act;
+
+    // Ignore SIGPIPE and SIGCHILD
     memset(&act, 0, sizeof act);
     act.sa_handler = SIG_IGN;
     if((sigaction(SIGPIPE, &act, NULL) == -1) || 
-        (sigaction(SIGCHLD, &act, NULL) == -1) ||
-        (signal(SIGINT, handle_sigint) == -1)) // TO DO
+        (sigaction(SIGCHLD, &act, NULL) == -1))
             exit(1);
 
     if(argc == 2){
