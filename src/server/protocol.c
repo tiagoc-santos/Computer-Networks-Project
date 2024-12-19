@@ -101,11 +101,13 @@ int init_tcp_socket() {
     }
 
     if(bind(tcp_socket, tcp_res->ai_addr,tcp_res->ai_addrlen) != 0){
+        close(tcp_socket);
         fprintf(stderr, "Binding error: %s\n", strerror(errno));
         return -1;
     }
     
     if(listen(tcp_socket, 5) == -1){
+        close(tcp_socket);
         fprintf(stderr, "Listening error: %s\n", strerror(errno));
         return -1;
     }

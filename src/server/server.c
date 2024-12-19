@@ -6,6 +6,12 @@
 #include "headers/show_trials.h"
 #include "headers/scoreboard.h"
 
+void handle_sigint(int signal){
+    //TO DO
+    //tem de fechar eventuais conexões TCP ainda ativas
+    
+}
+
 int handle_client_udp(){
     char message[MSG_SIZE], message_args[ARG_SIZE][CMD_SIZE];
 
@@ -83,7 +89,7 @@ int handle_client_tcp(){
 
     else{
         char response[MSG_SIZE];
-        strcpy(response, "ERR1\n");
+        strcpy(response, "ERR\n");
         send_tcp_message(socket, response, 0, NULL, NULL);
     }
     
@@ -93,15 +99,14 @@ int handle_client_tcp(){
 
 int main(int argc, char** argv){
 
-    // Ignore SIGPIPE and SIGCHILD
+    // Ignore SIGPIPE and SIGCHILD and handle SIGINT properly
     struct sigaction act;
     memset(&act, 0, sizeof act);
     act.sa_handler = SIG_IGN;
     if((sigaction(SIGPIPE, &act, NULL) == -1) || 
-        (sigaction(SIGCHLD, &act, NULL) == -1))
-        exit(1);
-
-    //TODO: handle SIGINT
+        (sigaction(SIGCHLD, &act, NULL) == -1) ||
+        (signal(SIGINT, handle_sigint) == -1)) // TO DO
+            exit(1);
 
     if(argc == 2){
         if (!strcmp(argv[1], "-v")){

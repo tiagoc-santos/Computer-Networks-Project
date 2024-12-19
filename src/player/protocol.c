@@ -275,15 +275,20 @@ int send_tcp_request(char message[MSG_SIZE], char filename[FILENAME_SIZE]){
     }
 
     struct addrinfo* server_info_tcp;
-    if (get_server_info(&server_info_tcp, server_IP, server_port, 0) != 0)
+    if (get_server_info(&server_info_tcp, server_IP, server_port, 0) != 0){
+        close(tcp_socket);
         return -1;
+    }
+        
 
     if(connect_server(tcp_socket, server_info_tcp) != 0){
+        close(tcp_socket);
         free(server_info_tcp);
         return -1;
     }
         
     if(write_message_tcp(tcp_socket, message) != 0){
+        close(tcp_socket);
         free(server_info_tcp);
         return -1;
     }
