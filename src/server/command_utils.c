@@ -409,9 +409,10 @@ int create_score_file(char filename[GAME_FILENAME_SIZE], char PLID[PLID_SIZE], c
     if(game_file == NULL)
         return -1;
 
-    if(fgets(buffer, sizeof(buffer), game_file) == NULL)
+    if(fgets(buffer, sizeof(buffer), game_file) == NULL){
+        fclose(game_file);
         return -1;
-
+    }
     if(sscanf(buffer, "%*s %c %*s %*s %*s %*s %*s", &M) != 1){
         fclose(game_file);
         return -1;

@@ -9,10 +9,12 @@
 int open_socket;
 
 void handle_sigint(int signal){
+    
     close(open_socket);
+
     if(close_udp_socket() != 0){
         fprintf(stderr, "Error closing udp socket.\n");
-         exit(1);
+        exit(1);
     }
     
     if(close_tcp_socket() != 0){
@@ -113,7 +115,9 @@ int handle_client_tcp()
         send_tcp_message(open_socket, response, 0, NULL, NULL);
     }
     
-    close(open_socket);
+    if(close(open_socket) != 0)
+        fprintf(stderr, "Error closing tcp communication socket\n");
+    
     return 0;
 }
 
