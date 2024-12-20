@@ -155,8 +155,11 @@ int main(int argc, char** argv) {
         }
 
         // show trials command
-        else if ((!strcmp(cmd_args[0], "st") || !strcmp(cmd_args[0], "show_trials")) 
-                    && player_id[0] != '\0'){
+        else if ((!strcmp(cmd_args[0], "st") || !strcmp(cmd_args[0], "show_trials"))){
+            if(player_id[0] == '\0'){
+                fprintf(stdout, "No PLID associated. Start a game first.\n");
+                continue;
+            }
             
             int ret_st = show_trials(player_id);
             

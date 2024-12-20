@@ -10,6 +10,17 @@ int open_socket;
 
 void handle_sigint(int signal){
     close(open_socket);
+    if(close_udp_socket() != 0){
+        fprintf(stderr, "Error closing udp socket.\n");
+         exit(1);
+    }
+    
+    if(close_tcp_socket() != 0){
+        fprintf(stderr, "Error closing tcp socket\n");
+        exit(1);
+    }
+
+    exit(0);
 }
 
 int handle_client_udp(){
@@ -148,6 +159,21 @@ int main(int argc, char** argv){
         }
     }
 
+    // Creates GAMES and SCORE directory 
+    if (mkdir("./src/server/GAMES", 0777) == -1) {
+        if (errno != EEXIST) {
+            fprintf(stderr,"Error creating directory");
+            exit(1);
+        }
+    }
+    if (mkdir("./src/server/SCORES", 0777) == -1) {
+        if (errno != EEXIST) {
+            fprintf(stderr,"Error creating directory");
+            exit(1);
+        }
+    }
+
+
     if(init_udp_socket() == -1)
         return -1;
     
@@ -183,6 +209,15 @@ int main(int argc, char** argv){
             handle_client_tcp();
     }
 
-    if(close_udp_socket() != 0)
+    if(close_udp_socket() != 0){
         fprintf(stderr, "Error closing udp socket.\n");
+         exit(1);
+    }
+    
+    if(close_tcp_socket() != 0){
+        fprintf(stderr, "Error closing tcp socket\n");
+        exit(1);
+    }
+    
+    return 0;
 }

@@ -15,6 +15,5 @@ Observações:
  em relação à diretoria atual.
  - Todos os paths são tratados de forma dinâmica em relação à diretoria principal, portanto se as pastas
 server e player forem mudadas de localização, estes path terão de ser alterados.
- - O servidor assume que as pastas server/GAMES e server/SCORES existem antes do seu arranque.
 
 Boas Festas

@@ -41,5 +41,6 @@ int connect_client();
 int read_message_tcp(int socket, char message[MSG_SIZE]);
 int send_tcp_message(int socket, char response[MSG_SIZE], int fsize, 
                         char fname[FILENAME_SIZE], char fcontents[FILE_SIZE]);
+int close_tcp_socket();
 
 #endif

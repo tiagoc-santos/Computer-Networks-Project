@@ -24,7 +24,7 @@ int init_udp_socket(){
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE|AI_NUMERICSERV;
 
-    if((errcode = getaddrinfo(NULL, port, &hints, &udp_res)) != 0){
+    if((errcode = getaddrinfo("localhost", port, &hints, &udp_res)) != 0){
         fprintf(stderr,"error: getaddrinfo: %s\n", gai_strerror(errcode));
         return -1;
     }
@@ -89,7 +89,7 @@ int init_tcp_socket() {
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    if ((errcode = getaddrinfo(NULL, port, &hints, &tcp_res)) != 0){
+    if ((errcode = getaddrinfo("localhost", port, &hints, &tcp_res)) != 0){
         fprintf(stderr,"error: getaddrinfo: %s\n", gai_strerror(errcode));
         return -1;
     }
@@ -202,5 +202,12 @@ int send_tcp_message(int socket, char response[MSG_SIZE], int fsize,
         }
     }
 
+    return 0;
+}
+
+int close_tcp_socket(){
+    freeaddrinfo(tcp_res);
+    if(close(tcp_socket) != 0)
+        return -1;
     return 0;
 }
