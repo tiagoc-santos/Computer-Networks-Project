@@ -8,6 +8,8 @@ Trabalhado realizado por:
 A pasta src é composta por três subpastas. Uma pasta server, uma pasta player e uma pasta common que possui código útil a ambas as
 aplicações (leitura/verificação de inputs, entre outros).
 
+A pasta reports possui os relatórios (em formato HTML) dos testes efetuados. 
+
 Para correr a aplicação basta, compilar os executáveis usando o comando "make" nesta diretoria,
 de seguida basta correr o servidor usando o comando "./GS", e por fim correr o cliente usando o comando "./player".
 
